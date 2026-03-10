@@ -6,27 +6,6 @@ const ServiceManager = () => {
   const [formData, setFormData] = useState({ name: '', price: '', duration: '', description: '' });
   const [editId, setEditId] = useState(null);
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // VALIDATE NGHIỆP VỤ (Yêu cầu bắt buộc)
-    if (Number(formData.price) <= 0) {
-      alert("Lỗi: Giá dịch vụ phải lớn hơn 0!");
-      return;
-    }
-    if (Number(formData.duration) <= 0) {
-      alert("Lỗi: Thời gian thực hiện phải lớn hơn 0 phút!");
-      return;
-    }
-
-    alert("Validate thành công, chuẩn bị gọi API...");
-    // Tạm dừng ở đây, API thêm/sửa sẽ làm ở commit sau
-  };
-
   useEffect(() => {
     fetchServices();
   }, []);
@@ -40,11 +19,54 @@ const ServiceManager = () => {
     }
   };
 
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // VALIDATE NGHIỆP VỤ
+    if (Number(formData.price) <= 0) {
+      alert("Lỗi: Giá dịch vụ phải lớn hơn 0!");
+      return;
+    }
+    if (Number(formData.duration) <= 0) {
+      alert("Lỗi: Thời gian thực hiện phải lớn hơn 0 phút!");
+      return;
+    }
+
+    try {
+      if (editId) {
+        // GỌI API SỬA (UPDATE)
+        await axios.put(`http://localhost:3000/services/${editId}`, formData);
+        alert("Cập nhật dịch vụ thành công!");
+      } else {
+        // GỌI API THÊM MỚI (CREATE)
+        await axios.post('http://localhost:3000/services', formData);
+        alert("Thêm dịch vụ mới thành công!");
+      }
+      
+      // Xóa trắng form sau khi lưu thành công và tải lại bảng
+      setFormData({ name: '', price: '', duration: '', description: '' });
+      setEditId(null);
+      fetchServices();
+    } catch (error) {
+      console.error("Lỗi khi lưu:", error);
+    }
+  };
+
+  // Hàm đổ dữ liệu từ bảng lên form khi bấm nút Sửa
+  const handleEdit = (srv) => {
+    setEditId(srv.id);
+    setFormData({ name: srv.name, price: srv.price, duration: srv.duration, description: srv.description });
+  };
+
   const handleDelete = async (id) => {
     if (window.confirm("Bạn có chắc muốn xóa dịch vụ này?")) {
       try {
         await axios.delete(`http://localhost:3000/services/${id}`);
-        fetchServices(); // Tải lại danh sách sau khi xóa
+        fetchServices();
       } catch (error) {
         console.error("Lỗi khi xóa:", error);
       }
@@ -55,14 +77,21 @@ const ServiceManager = () => {
     <div style={{ padding: '20px' }}>
       <h2>Quản lý Dịch vụ Barber</h2>
 
-      {/* ĐÂY LÀ PHẦN FORM VỪA ĐƯỢC THÊM VÀO */}
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', padding: '10px', border: '1px solid black' }}>
         <h3>{editId ? 'Sửa Dịch Vụ' : 'Thêm Dịch Vụ Mới'}</h3>
         <input type="text" name="name" placeholder="Tên dịch vụ" value={formData.name} onChange={handleInputChange} required style={{ marginRight: '5px' }} />
         <input type="number" name="price" placeholder="Giá (VNĐ)" value={formData.price} onChange={handleInputChange} required style={{ marginRight: '5px' }} />
         <input type="number" name="duration" placeholder="Thời gian (Phút)" value={formData.duration} onChange={handleInputChange} required style={{ marginRight: '5px' }} />
         <input type="text" name="description" placeholder="Mô tả" value={formData.description} onChange={handleInputChange} required style={{ marginRight: '5px' }} />
-        <button type="submit">{editId ? 'Cập nhật' : 'Thêm mới'}</button>
+        
+        <button type="submit" style={{ marginRight: '5px' }}>{editId ? 'Lưu Cập Nhật' : 'Thêm mới'}</button>
+        
+        {/* Nút hủy thoát khỏi chế độ sửa */}
+        {editId && (
+          <button type="button" onClick={() => { setEditId(null); setFormData({ name: '', price: '', duration: '', description: '' }) }}>
+            Hủy
+          </button>
+        )}
       </form>
 
       <table border="1" width="100%" cellPadding="10">
@@ -85,7 +114,7 @@ const ServiceManager = () => {
               <td>{srv.duration}</td>
               <td>{srv.description}</td>
               <td>
-                <button style={{ marginRight: '5px' }}>Sửa</button>
+                <button onClick={() => handleEdit(srv)} style={{ color: 'blue', marginRight: '5px' }}>Sửa</button>
                 <button onClick={() => handleDelete(srv.id)} style={{ color: 'red' }}>Xóa</button>
               </td>
             </tr>
