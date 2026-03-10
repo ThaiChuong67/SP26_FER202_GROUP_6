@@ -17,6 +17,18 @@ const ServiceManager = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm("Bạn có chắc muốn xóa dịch vụ này?")) {
+      try {
+        await axios.delete(`http://localhost:3000/services/${id}`);
+        fetchServices(); // Tải lại danh sách sau khi xóa
+      } catch (error) {
+        console.error("Lỗi khi xóa:", error);
+      }
+    }
+  };
+
+
   return (
     <div style={{ padding: '20px' }}>
       <h2>Quản lý Dịch vụ Barber</h2>
@@ -41,7 +53,7 @@ const ServiceManager = () => {
               <td>{srv.description}</td>
               <td>
                 <button>Sửa</button>
-                <button>Xóa</button>
+               <button onClick={() => handleDelete(srv.id)} style={{ color: 'red' }}>Xóa</button>
               </td>
             </tr>
           ))}
