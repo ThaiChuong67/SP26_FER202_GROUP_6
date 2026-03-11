@@ -9,5 +9,10 @@
     { "id": 2, "name": "Shampoo", "price": 50000 }
   ],
 
+  "customers": [
+    { "id": 1, "name": "Nguyen Van A", "phone": "0912345678", "email": "a@example.com" },
+    { "id": 2, "name": "Tran Thi B", "phone": "0987654321", "email": "b@example.com" }
+  ],
+
   "orders": []
 }
