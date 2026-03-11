@@ -87,59 +87,68 @@ setProductPrice(0);
 
 return(
 
-<div>
+<div className="container py-4">
+  <div className="card">
+    <div className="card-body">
+      <h2 className="card-title mb-4">Create Order</h2>
 
-<h2>Create Order</h2>
+      <div className="mb-3">
+        <label className="form-label">Customer</label>
+        <select
+          className="form-select"
+          value={selectedCustomerId}
+          onChange={e=>setSelectedCustomerId(e.target.value)}
+        >
+          <option value="">Select Customer</option>
+          {customers.map(c=>(
+            <option key={c.id} value={c.id}>
+              {c.name} - {c.phone}
+            </option>
+          ))}
+        </select>
+      </div>
 
-<label>
-Customer
-<br />
-<select value={selectedCustomerId} onChange={e=>setSelectedCustomerId(e.target.value)}>
-<option value="">Select Customer</option>
-{customers.map(c=>(
-<option key={c.id} value={c.id}>
-{c.name} - {c.phone}
-</option>
-))}
-</select>
-</label>
+      <div className="mb-3">
+        <label className="form-label">Service</label>
+        <select
+          className="form-select"
+          value={selectedServiceId}
+          onChange={handleService}
+        >
+          <option value="">Select Service</option>
+          {services.map(s=>(
+            <option key={s.id} value={s.id}>
+              {s.name} - {s.price}
+            </option>
+          ))}
+        </select>
+      </div>
 
-<br />
+      <div className="mb-3">
+        <label className="form-label">Product (optional)</label>
+        <select
+          className="form-select"
+          value={selectedProductId}
+          onChange={handleProduct}
+        >
+          <option value="">Select Product</option>
+          {products.map(p=>(
+            <option key={p.id} value={p.id}>
+              {p.name} - {p.price}
+            </option>
+          ))}
+        </select>
+      </div>
 
-<label>
-Service
-<br />
-<select value={selectedServiceId} onChange={handleService}>
-<option value="">Select Service</option>
-{services.map(s=>(
-<option key={s.id} value={s.id}>
-{s.name} - {s.price}
-</option>
-))}
-</select>
-</label>
+      <div className="mb-4">
+        <h5>Total Price: <span className="fw-bold">{totalPrice}</span></h5>
+      </div>
 
-<br />
-
-<label>
-Product (optional)
-<br />
-<select value={selectedProductId} onChange={handleProduct}>
-<option value="">Select Product</option>
-{products.map(p=>(
-<option key={p.id} value={p.id}>
-{p.name} - {p.price}
-</option>
-))}
-</select>
-</label>
-
-<h3>Total Price: {totalPrice}</h3>
-
-<button onClick={createOrder}>
-Create Order
-</button>
-
+      <button className="btn btn-primary" onClick={createOrder}>
+        Create Order
+      </button>
+    </div>
+  </div>
 </div>
 
 );

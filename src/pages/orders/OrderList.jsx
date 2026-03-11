@@ -42,55 +42,49 @@ return item ? item.name : "-";
 
 return(
 
-<div>
+<div className="container py-4">
+  <div className="card">
+    <div className="card-body">
+      <h2 className="card-title mb-4">Order List</h2>
 
-<h2>Order List</h2>
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover">
+          <thead className="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Service</th>
+              <th>Product</th>
+              <th>Date</th>
+              <th>Total Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-<table border="1">
-
-<thead>
-
-<tr>
-<th>ID</th>
-<th>Customer</th>
-<th>Service</th>
-<th>Product</th>
-<th>Date</th>
-<th>Total Price</th>
-<th>Action</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{orders.map(o=>(
-
-<tr key={o.id}>
-
-<td>{o.id}</td>
-<td>{getName(customers, o.customerId)}</td>
-<td>{getName(services, o.serviceId)}</td>
-<td>{o.productId ? getName(products, o.productId) : "(none)"}</td>
-<td>{o.date ? new Date(o.date).toLocaleString() : "-"}</td>
-<td>{o.totalPrice}</td>
-
-<td>
-
-<button onClick={()=>deleteOrder(o.id)}>
-Delete
-</button>
-
-</td>
-
-</tr>
-
-))}
-
-</tbody>
-
-</table>
-
+          <tbody>
+            {orders.map(o=>(
+              <tr key={o.id}>
+                <td>{o.id}</td>
+                <td>{getName(customers, o.customerId)}</td>
+                <td>{getName(services, o.serviceId)}</td>
+                <td>{o.productId ? getName(products, o.productId) : "(none)"}</td>
+                <td>{o.date ? new Date(o.date).toLocaleString() : "-"}</td>
+                <td>{o.totalPrice}</td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={()=>deleteOrder(o.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 );

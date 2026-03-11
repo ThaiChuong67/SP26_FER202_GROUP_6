@@ -6,12 +6,12 @@ function App(){
 
 return(
 
-<div>
-
-<OrderCreate/>
-<OrderList/>
-<Report/>
-
+<div className="container py-4">
+  <OrderCreate />
+  <hr />
+  <OrderList />
+  <hr />
+  <Report />
 </div>
 
 );

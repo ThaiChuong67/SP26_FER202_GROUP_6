@@ -50,21 +50,41 @@ const bestProduct = topItem(productCounts, products);
 
 return(
 
-<div>
+<div className="container py-4">
+  <div className="card">
+    <div className="card-body">
+      <h2 className="card-title mb-4">Revenue Report</h2>
 
-<h2>Revenue Report</h2>
+      <div className="row">
+        <div className="col-md-6 mb-3">
+          <div className="card bg-light">
+            <div className="card-body">
+              <h5 className="card-title">Totals</h5>
+              <ul className="list-group list-group-flush">
+                <li className="list-group-item">Total Revenue: <strong>{totalRevenue}</strong></li>
+                <li className="list-group-item">Total Orders: <strong>{orders.length}</strong></li>
+                <li className="list-group-item">Total Services: <strong>{services.length}</strong></li>
+                <li className="list-group-item">Total Products: <strong>{products.length}</strong></li>
+                <li className="list-group-item">Total Customers: <strong>{customers.length}</strong></li>
+              </ul>
+            </div>
+          </div>
+        </div>
 
-<h3>Total Revenue: {totalRevenue}</h3>
-
-<h3>Total Orders: {orders.length}</h3>
-
-<h3>Total Services: {services.length}</h3>
-<h3>Total Products: {products.length}</h3>
-<h3>Total Customers: {customers.length}</h3>
-
-<h3>Best Selling Service: {bestService}</h3>
-<h3>Best Selling Product: {bestProduct}</h3>
-
+        <div className="col-md-6 mb-3">
+          <div className="card bg-light">
+            <div className="card-body">
+              <h5 className="card-title">Best Sellers</h5>
+              <ul className="list-group list-group-flush">
+                <li className="list-group-item">Best Selling Service: <strong>{bestService}</strong></li>
+                <li className="list-group-item">Best Selling Product: <strong>{bestProduct}</strong></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 );
