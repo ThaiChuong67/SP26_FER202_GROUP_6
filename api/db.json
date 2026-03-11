@@ -1,18 +1,57 @@
 {
   "services": [
     { "id": 1, "name": "Haircut", "price": 100000 },
-    { "id": 2, "name": "Hair Dye", "price": 200000 }
+    { "id": 2, "name": "Hair Dye", "price": 200000 },
+    { "id": 3, "name": "Beard Trim", "price": 80000 },
+    { "id": 4, "name": "Haircut + Beard", "price": 150000 }
   ],
 
   "products": [
-    { "id": 1, "name": "Hair Wax", "price": 70000 },
-    { "id": 2, "name": "Shampoo", "price": 50000 }
+    { "id": 1, "name": "Hair Wax", "price": 70000, "quantity": 15, "image": "", "description": "Styling wax for hold and shine." },
+    { "id": 2, "name": "Shampoo", "price": 50000, "quantity": 30, "image": "", "description": "Gentle cleansing shampoo." },
+    { "id": 3, "name": "Beard Oil", "price": 90000, "quantity": 10, "image": "", "description": "Moisturizing beard oil." },
+    { "id": 4, "name": "Hair Spray", "price": 60000, "quantity": 5, "image": "", "description": "Strong hold hair spray." }
   ],
 
   "customers": [
     { "id": 1, "name": "Nguyen Van A", "phone": "0912345678", "email": "a@example.com" },
-    { "id": 2, "name": "Tran Thi B", "phone": "0987654321", "email": "b@example.com" }
+    { "id": 2, "name": "Tran Thi B", "phone": "0987654321", "email": "b@example.com" },
+    { "id": 3, "name": "Le Van C", "phone": "0911222333", "email": "c@example.com" },
+    { "id": 4, "name": "Pham Thi D", "phone": "0909876543", "email": "d@example.com" }
   ],
 
-  "orders": []
+  "orders": [
+    {
+      "id": 1,
+      "customerId": 1,
+      "serviceId": 1,
+      "productId": 1,
+      "totalPrice": 170000,
+      "date": "2026-03-11T10:30:00.000Z"
+    },
+    {
+      "id": 2,
+      "customerId": 2,
+      "serviceId": 2,
+      "productId": 2,
+      "totalPrice": 250000,
+      "date": "2026-03-11T14:15:00.000Z"
+    },
+    {
+      "id": 3,
+      "customerId": 3,
+      "serviceId": 3,
+      "productId": null,
+      "totalPrice": 80000,
+      "date": "2026-03-12T09:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "customerId": 1,
+      "serviceId": 4,
+      "productId": 3,
+      "totalPrice": 240000,
+      "date": "2026-03-12T10:30:00.000Z"
+    }
+  ]
 }
