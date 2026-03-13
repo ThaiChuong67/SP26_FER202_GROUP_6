@@ -13,20 +13,29 @@ const [selectedProductId,setSelectedProductId]=useState("");
 
 const [servicePrice,setServicePrice]=useState(0);
 const [productPrice,setProductPrice]=useState(0);
+const [error,setError]=useState(null);
 
 const totalPrice = servicePrice + productPrice;
 
 useEffect(()=>{
+  const load = async () => {
+    try {
+      const [sRes, pRes, cRes] = await Promise.all([
+        axios.get("http://localhost:3001/services"),
+        axios.get("http://localhost:3001/products"),
+        axios.get("http://localhost:3001/customers"),
+      ]);
 
-axios.get("http://localhost:3001/services")
-.then(res=>setServices(res.data));
+      setServices(sRes.data);
+      setProducts(pRes.data);
+      setCustomers(cRes.data);
+    } catch (err) {
+      console.error("Failed to load order form data", err);
+      setError(err);
+    }
+  };
 
-axios.get("http://localhost:3001/products")
-.then(res=>setProducts(res.data));
-
-axios.get("http://localhost:3001/customers")
-.then(res=>setCustomers(res.data));
-
+  load();
 },[]);
 
 const handleService = (e)=>{
@@ -74,15 +83,20 @@ totalPrice,
 date: new Date().toISOString()
 };
 
-axios.post("http://localhost:3001/orders",order)
-.then(()=>{
-alert("Order created");
-setSelectedCustomerId("");
-setSelectedServiceId("");
-setSelectedProductId("");
-setServicePrice(0);
-setProductPrice(0);
-});
+axios
+    .post("http://localhost:3001/orders", order)
+    .then(() => {
+      alert("Order created");
+      setSelectedCustomerId("");
+      setSelectedServiceId("");
+      setSelectedProductId("");
+      setServicePrice(0);
+      setProductPrice(0);
+    })
+    .catch((err) => {
+      console.error("Failed to create order", err);
+      setError(err);
+    });
 };
 
 return(
@@ -91,6 +105,12 @@ return(
   <div className="card">
     <div className="card-body">
       <h2 className="card-title mb-4">Create Order</h2>
+
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          Unable to load form data: {error.message || "Network error"}
+        </div>
+      )}
 
       <div className="mb-3">
         <label className="form-label">Customer</label>

@@ -16,8 +16,13 @@ function AddOrder() {
       totalPrice: totalPrice
     };
 
-    axios.post("http://localhost:3001/orders", order)
-      .then(() => alert("Order Created"));
+    axios
+      .post("http://localhost:3001/orders", order)
+      .then(() => alert("Order Created"))
+      .catch((err) => {
+        console.error("Failed to create order", err);
+        alert("Unable to create order. Please try again.");
+      });
   };
 
   return (

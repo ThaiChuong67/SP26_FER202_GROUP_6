@@ -6,10 +6,12 @@ function Report(){
   const [orders,setOrders]=useState([]);
 
   useEffect(()=>{
-
-    axios.get("http://localhost:3001/orders")
-      .then(res=>setOrders(res.data));
-
+    axios
+      .get("http://localhost:3001/orders")
+      .then((res) => setOrders(res.data))
+      .catch((err) => {
+        console.error("Failed to load orders", err);
+      });
   },[]);
 
   const totalRevenue = orders.reduce(

@@ -7,32 +7,40 @@ const [orders,setOrders]=useState([]);
 const [services,setServices]=useState([]);
 const [products,setProducts]=useState([]);
 const [customers,setCustomers]=useState([]);
+const [error,setError]=useState(null);
 
 useEffect(()=>{
+  const load = async () => {
+    try {
+      const [oRes, sRes, pRes, cRes] = await Promise.all([
+        axios.get("http://localhost:3001/orders"),
+        axios.get("http://localhost:3001/services"),
+        axios.get("http://localhost:3001/products"),
+        axios.get("http://localhost:3001/customers"),
+      ]);
 
-axios.get("http://localhost:3001/orders")
-.then(res=>setOrders(res.data));
+      setOrders(oRes.data);
+      setServices(sRes.data);
+      setProducts(pRes.data);
+      setCustomers(cRes.data);
+    } catch (err) {
+      console.error("Failed to load data", err);
+      setError(err);
+    }
+  };
 
-axios.get("http://localhost:3001/services")
-.then(res=>setServices(res.data));
-
-axios.get("http://localhost:3001/products")
-.then(res=>setProducts(res.data));
-
-axios.get("http://localhost:3001/customers")
-.then(res=>setCustomers(res.data));
-
-},[]);
+  load();
+}, []);
 
 const deleteOrder = (id)=>{
-
-axios.delete(`http://localhost:3001/orders/${id}`)
-.then(()=>{
-
-setOrders(orders.filter(o=>o.id!==id));
-
-});
-
+  axios.delete(`http://localhost:3001/orders/${id}`)
+    .then(()=>{
+      setOrders(orders.filter(o=>o.id!==id));
+    })
+    .catch((err) => {
+      console.error("Failed to delete order", err);
+      setError(err);
+    });
 };
 
 const getName = (list, id) => {
@@ -46,6 +54,12 @@ return(
   <div className="card">
     <div className="card-body">
       <h2 className="card-title mb-4">Order List</h2>
+
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          Unable to load orders: {error.message || "Network error"}
+        </div>
+      )}
 
       <div className="table-responsive">
         <table className="table table-bordered table-hover">
