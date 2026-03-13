@@ -20,7 +20,13 @@ export default function ProductList() {
   const [error, setError] = useState("");
 
   const load = () => {
-    axios.get("http://localhost:3001/products").then((res) => setProducts(res.data));
+    axios
+      .get("http://localhost:3001/products")
+      .then((res) => setProducts(res.data))
+      .catch((err) => {
+        console.error("Failed to load products", err);
+        setError("Unable to load products");
+      });
   };
 
   useEffect(() => {
@@ -60,10 +66,15 @@ export default function ProductList() {
       ? axios.put(`http://localhost:3001/products/${form.id}`, payload)
       : axios.post("http://localhost:3001/products", payload);
 
-    request.then(() => {
-      load();
-      resetForm();
-    });
+    request
+      .then(() => {
+        load();
+        resetForm();
+      })
+      .catch((err) => {
+        console.error("Failed to save product", err);
+        setError("Unable to save product");
+      });
   };
 
   const startEdit = (product) => {
@@ -81,7 +92,13 @@ export default function ProductList() {
 
   const deleteItem = (id) => {
     if (!window.confirm("Delete this product?")) return;
-    axios.delete(`http://localhost:3001/products/${id}`).then(() => load());
+    axios
+      .delete(`http://localhost:3001/products/${id}`)
+      .then(() => load())
+      .catch((err) => {
+        console.error("Failed to delete product", err);
+        setError("Unable to delete product");
+      });
   };
 
   const filtered = products
