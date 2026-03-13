@@ -15,7 +15,13 @@ export default function CustomerList() {
   const [error, setError] = useState("");
 
   const load = () => {
-    axios.get("http://localhost:3001/customers").then((res) => setCustomers(res.data));
+    axios
+      .get("http://localhost:3001/customers")
+      .then((res) => setCustomers(res.data))
+      .catch((err) => {
+        console.error("Failed to load customers", err);
+        setError("Unable to load customers");
+      });
   };
 
   useEffect(() => {
@@ -53,10 +59,15 @@ export default function CustomerList() {
       ? axios.put(`http://localhost:3001/customers/${form.id}`, payload)
       : axios.post("http://localhost:3001/customers", payload);
 
-    request.then(() => {
-      load();
-      resetForm();
-    });
+    request
+      .then(() => {
+        load();
+        resetForm();
+      })
+      .catch((err) => {
+        console.error("Failed to save customer", err);
+        setError("Unable to save customer");
+      });
   };
 
   const startEdit = (customer) => {
@@ -72,7 +83,13 @@ export default function CustomerList() {
 
   const deleteItem = (id) => {
     if (!window.confirm("Delete this customer?")) return;
-    axios.delete(`http://localhost:3001/customers/${id}`).then(() => load());
+    axios
+      .delete(`http://localhost:3001/customers/${id}`)
+      .then(() => load())
+      .catch((err) => {
+        console.error("Failed to delete customer", err);
+        setError("Unable to delete customer");
+      });
   };
 
   const filtered = customers.filter((c) =>
