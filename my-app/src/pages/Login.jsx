@@ -1,55 +1,72 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError(''); // Xóa lỗi cũ mỗi lần bấm login
     try {
-      // Gọi xuống JSON Server (giả sử bạn cấu hình DB có mảng /users)
       const response = await axios.get(`http://localhost:3000/users?username=${username}&password=${password}`);
 
       if (response.data.length > 0) {
-        // Đăng nhập thành công, lưu vào localStorage và vào Dashboard
         localStorage.setItem('user', JSON.stringify(response.data[0]));
         navigate('/dashboard');
       } else {
-        alert('Sai tài khoản hoặc mật khẩu!');
+        setError('Sai tài khoản hoặc mật khẩu!');
       }
-    } catch (error) {
-      console.error("Lỗi khi kết nối đến server", error);
+    } catch (err) {
+      setError('Lỗi kết nối đến máy chủ!');
+      console.error(err);
     }
   };
 
   return (
-    <div style={{ width: '300px', margin: '100px auto', textAlign: 'center' }}>
-      <h2>Đăng nhập</h2>
-      <form onSubmit={handleLogin}>
-        <div style={{ marginBottom: '10px' }}>
-          <input 
-            type="text" 
-            placeholder="Username" 
-            value={username} 
-            onChange={(e) => setUsername(e.target.value)} 
-            required 
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input 
-            type="password" 
-            placeholder="Password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>
+    // Container fluid chiếm toàn màn hình (vh-100) và căn giữa nội dung
+    <Container fluid className="d-flex justify-content-center align-items-center vh-100 bg-light">
+      <Card className="shadow-lg p-3" style={{ width: '400px', borderRadius: '15px' }}>
+        <Card.Body>
+          <h2 className="text-center mb-4 fw-bold">💈 Barber Login</h2>
+          
+          {/* Hiện thông báo lỗi nếu có */}
+          {error && <Alert variant="danger">{error}</Alert>}
+          
+          <Form onSubmit={handleLogin}>
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-medium">Tên đăng nhập</Form.Label>
+              <Form.Control 
+                type="text" 
+                placeholder="Nhập username..." 
+                value={username} 
+                onChange={(e) => setUsername(e.target.value)} 
+                required 
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-4">
+              <Form.Label className="fw-medium">Mật khẩu</Form.Label>
+              <Form.Control 
+                type="password" 
+                placeholder="Nhập password..." 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+              />
+            </Form.Group>
+
+            <Button variant="dark" type="submit" className="w-100 py-2 fw-bold fs-5">
+              Đăng Nhập
+            </Button>
+          </Form>
+        </Card.Body>
+      </Card>
+    </Container>
   );
 };
 
