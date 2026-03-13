@@ -10,7 +10,13 @@ export default function ServiceList() {
   const [error, setError] = useState("");
 
   const load = () => {
-    axios.get("http://localhost:3001/services").then((res) => setServices(res.data));
+    axios
+      .get("http://localhost:3001/services")
+      .then((res) => setServices(res.data))
+      .catch((err) => {
+        console.error("Failed to load services", err);
+        setError("Unable to load services");
+      });
   };
 
   useEffect(() => {
@@ -49,10 +55,15 @@ export default function ServiceList() {
       ? axios.put(`http://localhost:3001/services/${form.id}`, payload)
       : axios.post("http://localhost:3001/services", payload);
 
-    request.then(() => {
-      load();
-      resetForm();
-    });
+    request
+      .then(() => {
+        load();
+        resetForm();
+      })
+      .catch((err) => {
+        console.error("Failed to save service", err);
+        setError("Unable to save service");
+      });
   };
 
   const startEdit = (service) => {
@@ -69,7 +80,13 @@ export default function ServiceList() {
 
   const deleteItem = (id) => {
     if (!window.confirm("Delete this service?")) return;
-    axios.delete(`http://localhost:3001/services/${id}`).then(() => load());
+    axios
+      .delete(`http://localhost:3001/services/${id}`)
+      .then(() => load())
+      .catch((err) => {
+        console.error("Failed to delete service", err);
+        setError("Unable to delete service");
+      });
   };
 
   return (
