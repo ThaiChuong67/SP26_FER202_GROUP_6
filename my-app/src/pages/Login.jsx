@@ -11,12 +11,20 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(''); // Xóa lỗi cũ mỗi lần bấm login
+    setError(''); 
     try {
-      const response = await axios.get(`http://localhost:3000/users?username=${username}&password=${password}`);
+      // Gọi API lấy toàn bộ danh sách users thay vì lọc trên URL
+      const response = await axios.get('http://localhost:5000/users');
+      const users = response.data;
 
-      if (response.data.length > 0) {
-        localStorage.setItem('user', JSON.stringify(response.data[0]));
+      // Dùng hàm find của JavaScript để đối chiếu tài khoản & mật khẩu tuyệt đối
+      const foundUser = users.find(
+        (u) => u.username === username && u.password === password
+      );
+
+      if (foundUser) {
+        // Nếu tìm thấy, lưu thông tin và đẩy vào trang trong
+        localStorage.setItem('user', JSON.stringify(foundUser));
         navigate('/dashboard');
       } else {
         setError('Sai tài khoản hoặc mật khẩu!');

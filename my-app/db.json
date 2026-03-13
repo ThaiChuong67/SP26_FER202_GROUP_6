@@ -1,0 +1,15 @@
+{
+    "users": [
+      {
+        "id": "1",
+        "username": "admin",
+        "password": "123",
+        "fullName": "Hoàng Chương",
+        "role": "admin"
+      }
+    ],
+    "services": [],
+    "products": [],
+    "customers": [],
+    "orders": []
+  }
