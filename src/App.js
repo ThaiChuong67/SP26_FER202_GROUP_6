@@ -1,8 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { AuthProvider } from "./auth/AuthContext";
-import ProtectedRoute from "./auth/ProtectedRoute";
 import MainLayout from "./layout/MainLayout";
-import Login from "./pages/Login";
 import OrderCreate from "./pages/orders/OrderCreate";
 import OrderList from "./pages/orders/OrderList";
 import Report from "./pages/orders/Report";
@@ -13,18 +10,8 @@ import CustomerList from "./pages/customers/CustomerList";
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <MainLayout />
-              </ProtectedRoute>
-            }
-          >
+      <Routes>
+          <Route path="/" element={<MainLayout />}>
             <Route index element={<Navigate to="orders/create" replace />} />
             <Route path="orders/create" element={<OrderCreate />} />
             <Route path="orders/list" element={<OrderList />} />
@@ -34,9 +21,8 @@ function App() {
             <Route path="customers" element={<CustomerList />} />
           </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/orders/create" replace />} />
         </Routes>
-      </AuthProvider>
     </BrowserRouter>
   );
 }
