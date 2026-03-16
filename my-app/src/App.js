@@ -4,13 +4,11 @@ import AdminLayout from './components/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Service from './components/Service';
 import Dashboard from './components/Dashboard';
-
+import Product from './components/Product/Product';
 // --- CÁC COMPONENT TẠM THỜI (PLACEHOLDER) ---
 // Tạm thời tạo các component này để test. 
 // Sau này các bạn khác (Quý, Khánh, Anh, Trâm) làm xong sẽ import file thật vào đây.
 
-
-const Product = () => <h2>Trang Quản lý Sản phẩm (Đang phát triển)</h2>;
 const Customer = () => <h2>Trang Quản lý Khách hàng (Đang phát triển)</h2>;
 const Order = () => <h2>Trang Quản lý Đơn hàng (Đang phát triển)</h2>;
 
