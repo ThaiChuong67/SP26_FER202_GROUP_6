@@ -94,7 +94,36 @@
       "description": "Hấp phục hồi chuyên sâu cho tóc xơ rối do uốn/nhuộm nhiều lần."
     }
   ],
-  "products": [],
+  "products": [
+    {
+      "id": "1",
+      "name": "Sữa Rửa Mặt Tràm Trà Dr.FORSKIN Tea tree 100g - 100g",
+      "price": 270000,
+      "quantity": 20,
+      "description": ""
+    },
+    {
+      "id": "2",
+      "name": "Sáp vuốt tóc Glanzen Limited",
+      "price": 400000,
+      "quantity": 100,
+      "description": ""
+    },
+    {
+      "id": "3",
+      "name": "Xịt tạo kiểu tóc Glanzen X2 Booster 2025",
+      "price": 280000,
+      "quantity": 50,
+      "description": ""
+    },
+    {
+      "id": "4",
+      "name": "Nhuộm tóc dược liệu Thái Dương",
+      "price": 130000,
+      "quantity": 299,
+      "description": ""
+    }
+  ],
   "customers": [],
   "orders": [],
   "$schema": "./node_modules/json-server/schema.json"
