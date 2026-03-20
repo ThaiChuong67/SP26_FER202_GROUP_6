@@ -56,7 +56,7 @@ const Dashboard = () => {
   return (
     <Container fluid className="dashboard-supreme-wrapper py-4 px-lg-5">
       
-      {/* --- PHẦN 1: HEADER NGHỆ THUẬT --- */}
+      {/* --- PHẦN 1: HEADER NGHỆ THUẬT ĐẸP TƯƠI  --- */}
       <div className="dashboard-hero-section mb-5">
         <Row className="align-items-center">
           <Col md={8}>
@@ -82,7 +82,7 @@ const Dashboard = () => {
         </Row>
       </div>
 
-      {/* --- PHẦN 2: BỐ CỤC DỮ LIỆU THÔNG MINH --- */}
+      {/* --- PHẦN 2: BỐ CỤC DỮ LIỆU THÔNG MINH NHẤT --- */}
       <Row className="g-4">
         
         {/* DOANH THU & ĐƠN HÀNG (Dòng 1 - Tiêu điểm) */}
