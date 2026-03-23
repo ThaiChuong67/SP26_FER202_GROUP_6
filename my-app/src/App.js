@@ -8,7 +8,7 @@ import Product from './components/Product/Product';
 import Order from './components/Order/Order';
 import Report from './components/Report/Report';
 
-const Customer = () => <h2>Trang Quản lý Khách hàng (Đang phát triển)</h2>;
+import Customer from './components/Customer/Customer';
 
 function App() {
   return (

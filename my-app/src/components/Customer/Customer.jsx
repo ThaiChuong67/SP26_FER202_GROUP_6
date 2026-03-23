@@ -24,7 +24,7 @@ const Customer = () => {
   const fetchCustomers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:3001/customers');
+      const response = await axios.get('http://localhost:5000/customers');
       setCustomers(response.data);
     } catch (error) {
       premiumSwal.fire('Lỗi!', 'Lỗi khi tải danh sách khách hàng', 'error');
