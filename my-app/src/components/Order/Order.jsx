@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaFileInvoiceDollar, FaPlus, FaSearch, FaEdit, FaTrash, FaBolt } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 const Order = () => {
   const [orders, setOrders] = useState([]);
@@ -17,6 +18,14 @@ const Order = () => {
     serviceId: '',
     productId: '',
     date: new Date().toISOString().split('T')[0]
+  });
+
+  const premiumSwal = Swal.mixin({
+    customClass: {
+      confirmButton: 'btn btn-warning btn-lg px-5 fw-bold rounded-3 shadow-sm text-dark ms-3',
+      cancelButton: 'btn btn-outline-light btn-lg px-4 fw-bold rounded-3'
+    },
+    buttonsStyling: false
   });
 
   useEffect(() => {
@@ -61,7 +70,7 @@ const Order = () => {
     e.preventDefault();
     
     if (!formData.customerId || !formData.serviceId) {
-      alert('Vui lòng chọn khách hàng và dịch vụ!');
+      premiumSwal.fire('Lỗi!', 'Vui lòng chọn khách hàng và dịch vụ!', 'error');
       return;
     }
 
@@ -75,17 +84,17 @@ const Order = () => {
     try {
       if (editingOrder) {
         await axios.put(`http://localhost:5000/orders/${editingOrder.id}`, orderData);
-        alert('Cập nhật đơn hàng thành công!');
+        premiumSwal.fire('Thành công!', 'Cập nhật đơn hàng thành công!', 'success');
       } else {
         await axios.post('http://localhost:5000/orders', orderData);
-        alert('Tạo đơn hàng thành công!');
+        premiumSwal.fire('Thành công!', 'Tạo đơn hàng thành công!', 'success');
       }
       
       resetForm();
       fetchData();
     } catch (error) {
       console.error('Error saving order:', error);
-      alert('Có lỗi xảy ra!');
+      premiumSwal.fire('Lỗi!', 'Có lỗi xảy ra khi lưu đơn hàng!', 'error');
     }
   };
 
@@ -101,16 +110,32 @@ const Order = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Bạn có chắc muốn xóa đơn hàng này?')) {
-      try {
-        await axios.delete(`http://localhost:5000/orders/${id}`);
-        alert('Xóa đơn hàng thành công!');
-        fetchData();
-      } catch (error) {
-        console.error('Error deleting order:', error);
-        alert('Có lỗi xảy ra!');
+    const order = orders.find(o => o.id === id);
+    const customerName = getCustomerName(order?.customerId);
+    const serviceName = getServiceName(order?.serviceId);
+    
+    premiumSwal.fire({
+      title: 'Xác nhận xóa?',
+      html: `Bạn có chắc chắn muốn xóa đơn hàng <strong>#${order?.id || ''}</strong>?<br>
+             <small>Khách hàng: ${customerName}</small><br>
+             <small>Dịch vụ: ${serviceName}</small>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Đồng ý Xóa',
+      cancelButtonText: 'Hủy bỏ',
+      background: '#1a1a1a',
+      color: '#fff'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`http://localhost:5000/orders/${id}`);
+          premiumSwal.fire('Đã xóa!', 'Đơn hàng đã được xóa thành công.', 'success');
+          fetchData();
+        } catch (error) {
+          premiumSwal.fire('Lỗi!', 'Lỗi khi xóa đơn hàng', 'error');
+        }
       }
-    }
+    });
   };
 
   const resetForm = () => {

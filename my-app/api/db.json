@@ -160,6 +160,30 @@
       "productId": "1",
       "date": "2026-03-23",
       "totalPrice": 330000
+    },
+    {
+      "id": "ORDmn2v4ti3",
+      "customerId": "1",
+      "serviceId": "1",
+      "productId": "2",
+      "date": "2026-03-23",
+      "totalPrice": 460000
+    },
+    {
+      "id": "ORDmn2v7rc6",
+      "customerId": "2",
+      "serviceId": "4",
+      "productId": "3",
+      "date": "2026-03-23",
+      "totalPrice": 330000
+    },
+    {
+      "id": "ORDmn2v7zd2",
+      "customerId": "3",
+      "serviceId": "3",
+      "productId": "",
+      "date": "2026-03-23",
+      "totalPrice": 100000
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
