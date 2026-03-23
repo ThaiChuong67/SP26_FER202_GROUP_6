@@ -89,11 +89,11 @@ const Customer = () => {
     try {
       if (editingCustomer) {
         // Update existing customer
-        await axios.put(`http://localhost:3001/customers/${editingCustomer.id}`, formData);
+        await axios.put(`http://localhost:5000/customers/${editingCustomer.id}`, formData);
         premiumSwal.fire('Thành công!', 'Cập nhật khách hàng thành công!', 'success');
       } else {
         // Add new customer
-        await axios.post('http://localhost:3001/customers', formData);
+        await axios.post('http://localhost:5000/customers', formData);
         premiumSwal.fire('Thành công!', 'Thêm khách hàng thành công!', 'success');
       }
       
@@ -122,7 +122,7 @@ const Customer = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:3001/customers/${id}`);
+          await axios.delete(`http://localhost:5000/customers/${id}`);
           premiumSwal.fire('Đã xóa!', 'Khách hàng đã được xóa thành công.', 'success');
           fetchCustomers();
         } catch (error) {
