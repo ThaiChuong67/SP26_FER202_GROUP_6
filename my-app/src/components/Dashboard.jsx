@@ -187,7 +187,7 @@ const Dashboard = () => {
             <Card.Body className="d-flex align-items-center p-4">
                 <div className="mini-icon-box gold me-4"><FaUsers /></div>
                 <div>
-                    <span className="label-vip">KHÁCH HÀNG VIP</span>
+                    <span className="label-vip">ADMIN ACCOUNT</span>
                     <h2 className="text-white fw-bold mb-0">{stats.totalCustomers}</h2>
                 </div>
             </Card.Body>
