@@ -7,32 +7,62 @@ import {
 } from 'react-icons/fa';
 
 const Dashboard = () => {
+  // 1. KHỞI TẠO STATE (TRẠNG THÁI CỦA COMPONENT)
+  // data: Lưu trữ toàn bộ dữ liệu kéo từ API về. Khởi tạo là các mảng rỗng để lúc chưa có data, code không bị lỗi undefined.
   const [data, setData] = useState({ services: [], products: [], customers: [], orders: [] });
+  // isLoading: Biến cờ (flag) để theo dõi trạng thái đang tải dữ liệu. Ban đầu là true để hiện màn hình chờ.
   const [isLoading, setIsLoading] = useState(true);
 
+  // 2. FETCH DỮ LIỆU TỪ SERVER (CHẠY NGAY KHI COMPONENT ĐƯỢC MỞ)
+  // useEffect với dependency array rỗng [] có nghĩa là hàm này CHỈ CHẠY 1 LẦN DUY NHẤT khi component vừa được render lần đầu.
   useEffect(() => {
     const fetchAllData = async () => {
       try {
+        // Sử dụng Promise.all để gửi 4 request API CÙNG MỘT LÚC (song song).
+        // Nếu dùng await cho từng cái (tuần tự) thì sẽ rất chậm. Đây là một điểm cộng về tối ưu hiệu năng.
         const [srvRes, prodRes, custRes, ordRes] = await Promise.all([
           axios.get('http://localhost:5000/services'),
           axios.get('http://localhost:5000/products'),
           axios.get('http://localhost:5000/users'), 
           axios.get('http://localhost:5000/orders')
         ]);
-        setData({ services: srvRes.data, products: prodRes.data, customers: custRes.data, orders: ordRes.data });
+        
+        // Sau khi cả 4 API đều trả về thành công, ta gán dữ liệu (.data) vào state 'data'
+        setData({ 
+          services: srvRes.data, 
+          products: prodRes.data, 
+          customers: custRes.data, 
+          orders: ordRes.data 
+        });
       } catch (error) {
+        // Bắt lỗi nếu server sập, mất mạng, hoặc sai đường dẫn API
         console.error("Lỗi fetch Dashboard:", error);
       } finally {
+        // Khối finally LUÔN CHẠY dù thành công hay thất bại.
+        // setTimeout được dùng ở đây để tạo một độ trễ giả (800ms) giúp màn hình loading hiển thị đủ lâu để user nhìn thấy, tạo cảm giác mượt mà không bị giật chớp màn hình.
         setTimeout(() => setIsLoading(false), 800);
       }
     };
+    
+    // Gọi hàm vừa định nghĩa ở trên
     fetchAllData();
   }, []);
 
+  // 3. XỬ LÝ VÀ TÍNH TOÁN DỮ LIỆU (LOGIC THỐNG KÊ)
+  // useMemo được sử dụng để "nhớ" (cache) lại kết quả tính toán.
+  // Nó chỉ tính toán lại khi biến 'data' thay đổi (do có [data] ở cuối). 
+  // Việc này giúp tối ưu hiệu năng, tránh việc React phải cộng trừ lại toàn bộ đơn hàng mỗi khi giao diện vô tình bị re-render bởi một lý do khác.
   const stats = useMemo(() => {
+    // Tính tổng doanh thu: Dùng hàm reduce duyệt qua mảng orders. 
+    // Cộng dồn 'totalPrice' vào biến 'sum' (bắt đầu từ 0). Lệnh Number() ép kiểu để chắc chắn giá trị cộng vào là số.
     const totalRevenue = data.orders.reduce((sum, order) => sum + (Number(order.totalPrice) || 0), 0);
+    
+    // Lấy ra dịch vụ / sản phẩm đầu tiên (có thể sau này server sẽ trả về mảng đã sort theo doanh số). 
+    // Dấu '?.' (Optional chaining) để chống lỗi: nếu data.services[0] không tồn tại (mảng rỗng) thì nó sẽ không bị lỗi code mà sẽ gán giá trị mặc định (||) ở vế sau.
     const bestService = data.services[0]?.name || "Premium Haircut";
     const bestProduct = data.products[0]?.name || "Barber Wax Gold";
+    
+    // Trả về một object chứa toàn bộ số liệu đã tính toán để giao diện (JSX) bên dưới lấy ra dùng
     return {
       totalServices: data.services.length,
       totalProducts: data.products.length,
@@ -44,6 +74,8 @@ const Dashboard = () => {
     };
   }, [data]);
 
+  // 4. KIỂM TRA ĐIỀU KIỆN HIỂN THỊ TRƯỚC (CONDITIONAL RENDERING)
+  // Nếu isLoading vẫn là true (chưa fetch xong data hoặc chưa hết 800ms chờ), thì render ra màn hình loading chặn lại, không chạy xuống dưới.
   if (isLoading) {
     return (
       <div className="d-flex flex-column justify-content-center align-items-center vh-100 bg-black">
@@ -53,6 +85,7 @@ const Dashboard = () => {
     );
   }
 
+  // 5. HIỂN THỊ GIAO DIỆN CHÍNH (Chỉ chạy khi isLoading là false)
   return (
     <Container fluid className="dashboard-supreme-wrapper py-4 px-lg-5">
       
@@ -96,6 +129,7 @@ const Dashboard = () => {
                         <FaArrowUp className="text-success fs-4 animate-bounce" />
                     </div>
                     <h1 className="display-1 fw-900 text-white shimmer-text mb-2">
+                        {/* Sử dụng biến thống kê đã tính ở trên, toLocaleString() để định dạng số có dấu phẩy (vd: 1,000,000) */}
                         {stats.revenue.toLocaleString()}<small className="fs-3 ms-2 text-warning">VND</small>
                     </h1>
                     <div className="mt-4 d-flex align-items-center">
@@ -116,6 +150,7 @@ const Dashboard = () => {
                     <FaFileInvoiceDollar />
                 </div>
                 <span className="label-vip">TỔNG ĐƠN HÀNG</span>
+                {/* Lấy số lượng đơn hàng từ hàm useMemo */}
                 <h1 className="display-3 fw-900 text-white mt-2">{stats.totalOrders}</h1>
                 <p className="text-white-50 small mt-3">Tăng trưởng ổn định trong quý 1</p>
             </Card.Body>
