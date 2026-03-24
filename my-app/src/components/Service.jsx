@@ -7,27 +7,37 @@ import Swal from 'sweetalert2';
 const API_URL = 'http://localhost:5000/services';
 
 const Service = () => {
-    // --- STATE QUẢN LÝ DỮ LIỆU ---
+    // ==========================================
+    // 1. KHỞI TẠO STATE (TRẠNG THÁI CỦA COMPONENT)
+    // ==========================================
+    
+    // services: Mảng lưu trữ toàn bộ dữ liệu kéo từ API. Khởi tạo là mảng rỗng [] để các hàm map/filter ở dưới không bị lỗi "undefined".
     const [services, setServices] = useState([]);
+    // searchTerm: Lưu chuỗi người dùng gõ vào ô tìm kiếm.
     const [searchTerm, setSearchTerm] = useState('');
+    // isLoading: Biến cờ quản lý việc hiển thị hiệu ứng xoay xoay (Spinner) khi chờ API trả dữ liệu.
     const [isLoading, setIsLoading] = useState(true);
 
-    // --- STATE PHÂN TRANG ---
-    const [currentPage, setCurrentPage] = useState(1);
-    const servicesPerPage = 6;
+    // --- STATE PHÂN TRANG (PAGINATION) ---
+    const [currentPage, setCurrentPage] = useState(1); // Mặc định vào trang là đứng ở trang 1
+    const servicesPerPage = 6; // Cấu hình cứng: Mỗi trang chỉ hiện tối đa 6 dịch vụ
 
     // --- STATE MODAL THÊM MỚI ---
-    const [showAddModal, setShowAddModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false); // Quản lý ẩn/hiện popup Thêm
+    // newService: Object chứa dữ liệu tạm thời khi người dùng đang gõ vào form Thêm mới.
     const [newService, setNewService] = useState({ name: '', price: '', duration: '', description: '' });
 
     // --- STATE MODAL SỬA ---
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false); // Quản lý ẩn/hiện popup Sửa
+    // editService: Object chứa dữ liệu của dịch vụ ĐANG ĐƯỢC CHỌN để sửa.
     const [editService, setEditService] = useState({ id: '', name: '', price: '', duration: '', description: '' });
+    // originalId: Cực kỳ quan trọng. Lưu lại ID gốc của dịch vụ lúc vừa bấm nút "Sửa" để làm mốc gọi API PUT.
     const [originalId, setOriginalId] = useState('');
 
-    // --- STATE THÔNG BÁO ---
+    // --- STATE THÔNG BÁO (TOAST) ---
     const [toast, setToast] = useState({ show: false, message: '', variant: 'success' });
 
+    // Cấu hình custom cho thư viện SweetAlert2 (Popup xác nhận xóa)
     const premiumSwal = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-warning btn-lg px-5 fw-bold rounded-3 shadow-sm text-dark ms-3',
@@ -36,8 +46,12 @@ const Service = () => {
         buttonsStyling: false
     });
 
+    // Hàm tiện ích bắn thông báo
     const showNotification = (message, variant = 'success') => setToast({ show: true, message, variant });
 
+    // ==========================================
+    // 2. GỌI API & LẤY DỮ LIỆU (READ)
+    // ==========================================
     useEffect(() => { fetchServices(); }, []);
 
     const fetchServices = async () => {
@@ -52,10 +66,13 @@ const Service = () => {
         }
     };
 
-    // --- XỬ LÝ THÊM MỚI ---
+    // ==========================================
+    // 3. XỬ LÝ THÊM MỚI (CREATE)
+    // ==========================================
     const handleAddSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); 
         try {
+            // Lọc ID và tìm ID lớn nhất để + 1
             const validIds = services.map(s => Number(s.id)).filter(id => !isNaN(id));
             const nextId = validIds.length > 0 ? (Math.max(...validIds) + 1).toString() : "1";
 
@@ -67,7 +84,7 @@ const Service = () => {
                 description: newService.description || ""
             };
 
-            await axios.post(API_URL, serviceToSave);
+            await axios.post(API_URL, serviceToSave); 
             setShowAddModal(false); 
             setNewService({ name: '', price: '', duration: '', description: '' }); 
             await fetchServices(); 
@@ -77,11 +94,13 @@ const Service = () => {
         }
     };
 
-    // --- XỬ LÝ SỬA ---
+    // ==========================================
+    // 4. XỬ LÝ SỬA DỮ LIỆU (UPDATE)
+    // ==========================================
     const handleShowEdit = (service) => {
         setOriginalId(service.id); 
         setEditService(service); 
-        setShowEditModal(true);
+        setShowEditModal(true); 
     };
 
     const handleUpdate = async (e) => {
@@ -91,14 +110,16 @@ const Service = () => {
                 ...editService, price: Number(editService.price), duration: Number(editService.duration)
             });
             setShowEditModal(false); 
-            fetchServices();
+            fetchServices(); 
             showNotification('Cập nhật thành công!');
         } catch (error) { 
             showNotification('Lỗi cập nhật!', 'danger'); 
         }
     };
 
-    // --- XỬ LÝ XÓA ---
+    // ==========================================
+    // 5. XỬ LÝ XÓA DỮ LIỆU (DELETE)
+    // ==========================================
     const handleDelete = async (id) => {
         const serviceToDelete = services.find(s => s.id === id);
         const serviceName = serviceToDelete ? serviceToDelete.name : 'dịch vụ này';
@@ -115,9 +136,12 @@ const Service = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`${API_URL}/${id}`);
-                    await fetchServices();
+                    await axios.delete(`${API_URL}/${id}`); 
+                    await fetchServices(); 
+                    
+                    // Lùi 1 trang nếu trang hiện tại bị xóa hết item
                     if (currentItems.length === 1 && currentPage > 1) setCurrentPage(currentPage - 1);
+                    
                     showNotification('Đã xóa thành công!');
                 } catch (error) {
                     showNotification('Lỗi khi xóa!', 'danger');
@@ -126,16 +150,23 @@ const Service = () => {
         });
     };
 
-    // --- LỌC, SẮP XẾP ---
+    // ==========================================
+    // 6. XỬ LÝ TÌM KIẾM, LỌC VÀ PHÂN TRANG
+    // ==========================================
     const filtered = services
         .filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
         .sort((a, b) => Number(a.id) - Number(b.id)); 
 
     const indexOfLast = currentPage * servicesPerPage;
     const indexOfFirst = indexOfLast - servicesPerPage;
+    
+    // Cắt mảng filtered để hiển thị đúng dữ liệu của trang hiện tại
     const currentItems = filtered.slice(indexOfFirst, indexOfLast);
     const totalPages = Math.ceil(filtered.length / servicesPerPage);
 
+    // ==========================================
+    // 7. GIAO DIỆN (JSX)
+    // ==========================================
     return (
         <Container className="py-4 px-lg-5 dashboard-supreme-wrapper" style={{ maxWidth: '1400px' }}>
             <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999, position: 'fixed' }}>
