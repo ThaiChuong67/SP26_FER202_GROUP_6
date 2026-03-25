@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaFileInvoiceDollar, FaPlus, FaSearch, FaEdit, FaTrash, FaBolt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import { Pagination } from 'react-bootstrap';
 
 // Component chính cho trang quản lý đơn hàng
 const Order = () => {
@@ -13,7 +14,8 @@ const Order = () => {
   const [showForm, setShowForm] = useState(false); // Hiển thị/ẩn form tạo đơn hàng
   const [editingOrder, setEditingOrder] = useState(null); // Đơn hàng đang được chỉnh sửa
   const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 6;
   // State cho dữ liệu form
   const [formData, setFormData] = useState({
     customerId: '', // ID khách hàng được chọn
@@ -43,8 +45,8 @@ const Order = () => {
       const [ordersRes, customersRes, servicesRes, productsRes] = await Promise.all([
         axios.get('http://localhost:5000/orders'), // Lấy danh sách đơn hàng
         axios.get('http://localhost:5000/customers'), // Lấy danh sách khách hàng
-        axios.get('http://localhost:5000/services'), 
-        axios.get('http://localhost:5000/products') 
+        axios.get('http://localhost:5000/services'),
+        axios.get('http://localhost:5000/products')
       ]);
 
       // Cập nhật state với dữ liệu từ API
@@ -60,26 +62,26 @@ const Order = () => {
   // Hàm tính tổng tiền đơn hàng (dịch vụ + sản phẩm)
   const calculateTotalPrice = () => {
     let total = 0;
-    
+
     // Tìm và cộng giá dịch vụ
     const service = services.find(s => s.id === formData.serviceId);
     if (service) {
       total += service.price;
     }
-    
+
     // Tìm và cộng giá sản phẩm (nếu có)
     const product = products.find(p => p.id === formData.productId);
     if (product) {
       total += product.price;
     }
-    
+
     return total;
   };
 
   // Hàm xử lý submit form (tạo mới hoặc cập nhật đơn hàng)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate form: phải có khách hàng và dịch vụ
     if (!formData.customerId || !formData.serviceId) {
       premiumSwal.fire('Lỗi!', 'Vui lòng chọn khách hàng và dịch vụ!', 'error');
@@ -104,7 +106,7 @@ const Order = () => {
         await axios.post('http://localhost:5000/orders', orderData);
         premiumSwal.fire('Thành công!', 'Tạo đơn hàng thành công!', 'success');
       }
-      
+
       // Reset form và fetch lại dữ liệu
       resetForm();
       fetchData();
@@ -133,7 +135,7 @@ const Order = () => {
     const order = orders.find(o => o.id === id);
     const customerName = getCustomerName(order?.customerId);
     const serviceName = getServiceName(order?.serviceId);
-    
+
     // Hiển thị dialog xác nhận xóa
     premiumSwal.fire({
       title: 'Xác nhận xóa?',
@@ -178,7 +180,7 @@ const Order = () => {
     const customer = customers.find(c => c.id === order.customerId);
     const service = services.find(s => s.id === order.serviceId);
     const searchLower = searchTerm.toLowerCase();
-    
+
     // Kiểm tra xem từ khóa có trong tên khách hàng, tên dịch vụ, hoặc ngày không
     return (
       customer?.name.toLowerCase().includes(searchLower) ||
@@ -186,6 +188,10 @@ const Order = () => {
       order.date.includes(searchTerm)
     );
   });
+  const indexOfLast = currentPage * ordersPerPage;
+  const indexOfFirst = indexOfLast - ordersPerPage;
+  const currentOrders = filteredOrders.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
 
   // Hàm lấy tên khách hàng từ ID
   const getCustomerName = (customerId) => {
@@ -240,7 +246,7 @@ const Order = () => {
             className="search-input"
           />
         </div>
-        <button 
+        <button
           className="btn-create-order"
           onClick={() => setShowForm(true)}
         >
@@ -259,7 +265,7 @@ const Order = () => {
                 <label>Khách hàng:</label>
                 <select
                   value={formData.customerId}
-                  onChange={(e) => setFormData({...formData, customerId: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
                   required
                 >
                   <option value="">-- Chọn khách hàng --</option>
@@ -276,7 +282,7 @@ const Order = () => {
                 <label>Dịch vụ:</label>
                 <select
                   value={formData.serviceId}
-                  onChange={(e) => setFormData({...formData, serviceId: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, serviceId: e.target.value })}
                   required
                 >
                   <option value="">-- Chọn dịch vụ --</option>
@@ -293,7 +299,7 @@ const Order = () => {
                 <label>Sản phẩm (tùy chọn):</label>
                 <select
                   value={formData.productId}
-                  onChange={(e) => setFormData({...formData, productId: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
                 >
                   <option value="">-- Không chọn sản phẩm --</option>
                   {products.map(product => (
@@ -310,7 +316,7 @@ const Order = () => {
                 <input
                   type="date"
                   value={formData.date}
-                  onChange={(e) => setFormData({...formData, date: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   required
                 />
               </div>
@@ -357,7 +363,7 @@ const Order = () => {
             </thead>
             <tbody>
               {/* Hiển thị danh sách đơn hàng đã lọc */}
-              {filteredOrders.map(order => (
+              {currentOrders.map(order => (
                 <tr key={order.id}>
                   <td>{order.id}</td>
                   <td>{getCustomerName(order.customerId)}</td>
@@ -366,27 +372,44 @@ const Order = () => {
                   <td>{order.totalPrice?.toLocaleString()} VNĐ</td>
                   <td>{order.date}</td>
                   <td>
-                    {/* Nút sửa */}
-                    <button 
-                      className="btn-action btn-edit"
-                      onClick={() => handleEdit(order)}
-                    >
-                      <FaEdit /> Sửa
-                    </button>
-                    {/* Nút xóa */}
-                    <button 
-                      className="btn-action btn-delete"
-                      onClick={() => handleDelete(order.id)}
-                    >
-                      <FaTrash /> Xóa
-                    </button>
+                    <div className="d-flex gap-2">
+                      <button
+                        className="btn btn-outline-warning rounded-circle btn-icon-pro"
+                        style={{ width: '35px', height: '35px', display: 'inline-flex', alignItems: 'center', justify_content: 'center' }}
+                        onClick={() => handleEdit(order)}
+                      >
+                        <FaEdit size={12} />
+                      </button>
+
+                      <button
+                        className="btn btn-outline-danger rounded-circle btn-icon-pro"
+                        style={{ width: '35px', height: '35px', display: 'inline-flex', alignItems: 'center', justify_content: 'center' }}
+                        onClick={() => handleDelete(order.id)}
+                      >
+                        <FaTrash size={12} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        
+        {totalPages > 1 && (
+          <div className="pt-4 d-flex justify-content-center">
+            <Pagination className="pagination-luxury">
+              {[...Array(totalPages)].map((_, i) => (
+                <Pagination.Item
+                  key={i + 1}
+                  active={i + 1 === currentPage}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </Pagination.Item>
+              ))}
+            </Pagination>
+          </div>
+        )}
         {/* Hiển thị thông báo khi không có dữ liệu */}
         {filteredOrders.length === 0 && (
           <div className="no-data">
@@ -715,6 +738,38 @@ const Order = () => {
           color: #666;
           font-style: italic;
         }
+        .pagination-luxury { 
+          display: inline-flex;
+          border-radius: 12px;
+          overflow: hidden; 
+          border: 1px solid rgba(255, 193, 7, 0.2) !important;
+          margin-top: 20px;
+      }
+
+      .pagination-luxury .page-link { 
+          background: #0d0d0d !important; 
+          color: #fff !important; 
+          margin: 0 !important; 
+          padding: 10px 20px !important;
+          border: none !important;
+          border-right: 1px solid rgba(255, 193, 7, 0.1) !important;
+          border-radius: 0 !important;
+          transition: all 0.3s;
+      }
+
+      .pagination-luxury .page-item:last-child .page-link {
+          border-right: none !important;
+      }
+
+      .pagination-luxury .page-item.active .page-link { 
+          background: #ffc107 !important; 
+          color: #000 !important; 
+          font-weight: 800 !important;
+      }
+
+      .pagination-luxury .page-link:hover:not(.active) { 
+          background: rgba(255, 193, 7, 0.2) !important;
+      }
       `}</style>
     </div>
   );
