@@ -321,6 +321,38 @@ const Customer = () => {
     }
   };
 
+  // Handle export CSV
+  const handleExportCSV = () => {
+    const dataToExport = sortedCustomers.map(customer => ({
+      ID: customer.id,
+      'Họ và tên': customer.name,
+      'Số điện thoại': customer.phone,
+      'Email': customer.email
+    }));
+
+    // Convert to CSV
+    const headers = Object.keys(dataToExport[0] || {});
+    const csvContent = [
+      headers.join(','),
+      ...dataToExport.map(row => 
+        headers.map(header => `"${row[header]}"`).join(',')
+      )
+    ].join('\n');
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `customers_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    premiumSwal.fire('Thành công!', 'Dữ liệu đã được xuất ra file CSV.', 'success');
+  };
+
   // Handle select individual
   const handleSelectCustomer = (id) => {
     setSelectedCustomers(prev => 
@@ -513,6 +545,10 @@ const Customer = () => {
                         onChange={(e) => handleSearchChange('email', e.target.value)}
                       />
                     </InputGroup>
+                    
+                    <Button variant="outline-primary" onClick={handleExportCSV}>
+                      <FaFileExport className="me-2" /> Xuất CSV
+                    </Button>
                     
                     <Button variant="warning" onClick={handleAdd}>
                       <FaPlus className="me-2 mb-1" /> Thêm khách hàng
