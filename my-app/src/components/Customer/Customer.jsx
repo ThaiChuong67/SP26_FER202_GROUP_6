@@ -5,22 +5,21 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 
 const Customer = () => {
-  const [customers, setCustomers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [editingCustomer, setEditingCustomer] = useState(null);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [searchPhone, setSearchPhone] = useState('');
-  const [searchName, setSearchName] = useState('');
-  const [searchEmail, setSearchEmail] = useState('');
-  const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
-  const [selectedCustomers, setSelectedCustomers] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [sortField, setSortField] = useState('id');
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [formErrors, setFormErrors] = useState({});
+  // ============= STATE MANAGEMENT =============
+  const [customers, setCustomers] = useState([]); // Danh sách khách hàng từ API
+  const [loading, setLoading] = useState(false); // Trạng thái loading
+  const [modalVisible, setModalVisible] = useState(false); // Modal thêm/sửa khách hàng
+  const [detailModalVisible, setDetailModalVisible] = useState(false); // Modal xem chi tiết
+  const [editingCustomer, setEditingCustomer] = useState(null); // Khách hàng đang sửa
+  const [selectedCustomer, setSelectedCustomer] = useState(null); // Khách hàng đang xem chi tiết
+  const [searchQuery, setSearchQuery] = useState(''); // Từ khóa tìm kiếm
+  const [formData, setFormData] = useState({ name: '', phone: '', email: '' }); // Dữ liệu form
+  const [selectedCustomers, setSelectedCustomers] = useState([]); // Danh sách khách hàng đã chọn (bulk operations)
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Số item mỗi trang
+  const [sortField, setSortField] = useState('id'); // Trường đang sắp xếp
+  const [sortDirection, setSortDirection] = useState('asc'); // Chiều sắp xếp (asc/desc)
+  const [formErrors, setFormErrors] = useState({}); // Lỗi form validation
 
   const premiumSwal = Swal.mixin({
     customClass: {
@@ -30,7 +29,8 @@ const Customer = () => {
     buttonsStyling: false
   });
 
-  // Fetch customers from API
+  // ============= API FUNCTIONS =============
+  // Fetch customers từ API
   const fetchCustomers = async () => {
     setLoading(true);
     try {
@@ -43,10 +43,7 @@ const Customer = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
-
+  // ============= VALIDATION FUNCTIONS =============
   // Email validation regex - chỉ cho phép ký tự hợp lệ
   const validateEmail = (email) => {
     // Chỉ cho phép letters, numbers, @, ., -, _ 
@@ -54,7 +51,14 @@ const Customer = () => {
     return re.test(String(email).toLowerCase());
   };
 
-  // Handle form submit with enhanced validation
+  // Phone validation - chỉ cho phép số
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[0-9]+$/;
+    return phoneRegex.test(phone);
+  };
+
+  // ============= FORM HANDLERS =============
+  // Handle form submit với enhanced validation
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -127,7 +131,7 @@ const Customer = () => {
     }
   };
 
-  // Handle delete
+  // Handle delete khách hàng
   const handleDelete = async (id) => {
     const customer = customers.find(c => c.id === id);
     
@@ -153,14 +157,14 @@ const Customer = () => {
     });
   };
 
-  // Handle edit
+  // Handle edit khách hàng
   const handleEdit = (customer) => {
     setEditingCustomer(customer);
     setFormData(customer);
     setModalVisible(true);
   };
 
-  // Handle add new
+  // Handle add new khách hàng
   const handleAdd = () => {
     setEditingCustomer(null);
     setFormData({ name: '', phone: '', email: '' });
@@ -168,24 +172,13 @@ const Customer = () => {
     setModalVisible(true);
   };
 
-  // Enhanced search handlers
-  const handleSearchChange = (field, value) => {
-    switch(field) {
-      case 'phone':
-        if (value === '' || validatePhone(value)) {
-          setSearchPhone(value);
-        }
-        break;
-      case 'name':
-        setSearchName(value);
-        break;
-      case 'email':
-        setSearchEmail(value);
-        break;
-    }
+  // ============= SEARCH & SORT =============
+  // Enhanced search handlers - tìm kiếm theo tên hoặc SĐT
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
   };
 
-  // Handle sort
+  // Handle sort sắp xếp dữ liệu
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -195,17 +188,18 @@ const Customer = () => {
     }
   };
 
-  // Enhanced search functionality
+  // ============= DATA PROCESSING =============
+  // Enhanced search functionality - lọc khách hàng theo từ khóa
   const filteredCustomers = useMemo(() => {
     return customers.filter(customer => {
-      const matchesPhone = customer.phone.includes(searchPhone);
-      const matchesName = customer.name.toLowerCase().includes(searchName.toLowerCase());
-      const matchesEmail = customer.email.toLowerCase().includes(searchEmail.toLowerCase());
-      return matchesPhone && matchesName && matchesEmail;
+      const query = searchQuery.toLowerCase();
+      const matchesPhone = customer.phone.includes(searchQuery);
+      const matchesName = customer.name.toLowerCase().includes(query);
+      return matchesPhone || matchesName;
     });
-  }, [customers, searchPhone, searchName, searchEmail]);
+  }, [customers, searchQuery]);
 
-  // Sort customers
+  // Sort customers - sắp xếp dữ liệu đã lọc
   const sortedCustomers = useMemo(() => {
     return [...filteredCustomers].sort((a, b) => {
       let aValue = a[sortField];
@@ -224,7 +218,7 @@ const Customer = () => {
     });
   }, [filteredCustomers, sortField, sortDirection]);
 
-  // Pagination
+  // Pagination - phân trang dữ liệu
   const paginatedCustomers = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return sortedCustomers.slice(startIndex, startIndex + itemsPerPage);
@@ -232,18 +226,8 @@ const Customer = () => {
 
   const totalPages = Math.ceil(sortedCustomers.length / itemsPerPage);
 
-  // Reset pagination when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchPhone, searchName, searchEmail, itemsPerPage]);
-
-  // Phone validation - chỉ cho phép số
-  const validatePhone = (phone) => {
-    const phoneRegex = /^[0-9]+$/;
-    return phoneRegex.test(phone);
-  };
-
-  // Handle input change with validation
+  // ============= VALIDATION & INPUT =============
+  // Handle input change with validation - xử lý input với validation
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
@@ -274,13 +258,14 @@ const Customer = () => {
     }
   };
 
-  // Handle view details
+  // ============= BULK OPERATIONS =============
+  // Handle view details - xem chi tiết khách hàng
   const handleViewDetails = (customer) => {
     setSelectedCustomer(customer);
     setDetailModalVisible(true);
   };
 
-  // Handle bulk delete
+  // Handle bulk delete - xóa hàng loạt khách hàng
   const handleBulkDelete = async () => {
     if (selectedCustomers.length === 0) {
       premiumSwal.fire('Thông báo!', 'Vui lòng chọn ít nhất một khách hàng để xóa.', 'info');
@@ -312,7 +297,7 @@ const Customer = () => {
     });
   };
 
-  // Handle select all
+  // Handle select all - chọn tất cả khách hàng trên trang
   const handleSelectAll = () => {
     if (selectedCustomers.length === paginatedCustomers.length) {
       setSelectedCustomers([]);
@@ -321,8 +306,32 @@ const Customer = () => {
     }
   };
 
-  // Handle export CSV
+  // ============= EXPORT FUNCTIONS =============
+  // Handle export CSV - xuất dữ liệu ra file CSV
   const handleExportCSV = () => {
+    if (sortedCustomers.length === 0) {
+      premiumSwal.fire('Thông báo!', 'Không có dữ liệu để xuất.', 'info');
+      return;
+    }
+
+    premiumSwal.fire({
+      title: 'Xác nhận xuất CSV?',
+      html: `Bạn có chắc chắn muốn xuất <strong>${sortedCustomers.length}</strong> khách hàng ra file CSV?<br><small>Dữ liệu sẽ bao gồm các khách hàng đã lọc và sắp xếp hiện tại.</small>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Đồng ý Xuất',
+      cancelButtonText: 'Hủy bỏ',
+      background: '#1a1a1a',
+      color: '#fff'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        performExportCSV();
+      }
+    });
+  };
+
+  // Perform the actual CSV export - thực hiện xuất CSV
+  const performExportCSV = () => {
     const dataToExport = sortedCustomers.map(customer => ({
       ID: customer.id,
       'Họ và tên': customer.name,
@@ -350,10 +359,10 @@ const Customer = () => {
     link.click();
     document.body.removeChild(link);
 
-    premiumSwal.fire('Thành công!', 'Dữ liệu đã được xuất ra file CSV.', 'success');
+    premiumSwal.fire('Thành công!', `Đã xuất thành công ${sortedCustomers.length} khách hàng ra file CSV.`, 'success');
   };
 
-  // Handle select individual
+  // Handle select individual - chọn/bỏ chọn một khách hàng
   const handleSelectCustomer = (id) => {
     setSelectedCustomers(prev => 
       prev.includes(id) 
@@ -361,6 +370,17 @@ const Customer = () => {
         : [...prev, id]
     );
   };
+
+  // ============= EFFECTS =============
+  // Initial data fetch
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, itemsPerPage]);
 
   return (
     <>
@@ -498,6 +518,21 @@ const Customer = () => {
           border-left: none !important;
           border-radius: 0 25px 25px 0 !important;
         }
+
+        /* MODAL STYLES */
+        .modal.show {
+          display: block !important;
+          z-index: 9999 !important;
+        }
+        
+        .modal-backdrop.show {
+          z-index: 9998 !important;
+        }
+
+        .modal-content {
+          z-index: 10000 !important;
+          position: relative !important;
+        }
       `}</style>
 
       <Container fluid className="customer-wrapper">
@@ -505,44 +540,21 @@ const Customer = () => {
           <Col>
             <Card className="luxury-card h-100">
               <Card.Body className="p-4 position-relative z-10">
-                <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                {/* Header với tìm kiếm và các nút action */}
+                <div className="d-flex justify-content-between align-items-center mb-4">
                   <h5 className="mb-0 fw-bold text-uppercase d-flex align-items-center text-white">
                     <FaUser className="me-2 text-warning" /> Quản lý Khách hàng
                   </h5>
 
-                  <div className="d-flex gap-2 align-items-center flex-wrap">
-                    <InputGroup style={{ width: '250px' }}>
+                  <div className="d-flex gap-2 align-items-center">
+                    <InputGroup style={{ width: '450px' }}>
                       <InputGroup.Text><FaSearch /></InputGroup.Text>
                       <Form.Control
                         type="text"
-                        placeholder="Tên khách hàng"
+                        placeholder="Tìm kiếm theo tên hoặc số điện thoại"
                         className="dark-input"
-                        value={searchName}
-                        onChange={(e) => handleSearchChange('name', e.target.value)}
-                      />
-                    </InputGroup>
-                    
-                    <InputGroup style={{ width: '200px' }}>
-                      <InputGroup.Text><FaSearch /></InputGroup.Text>
-                      <Form.Control
-                        type="tel"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        placeholder="Số điện thoại"
-                        className="dark-input"
-                        value={searchPhone}
-                        onChange={(e) => handleSearchChange('phone', e.target.value)}
-                      />
-                    </InputGroup>
-                    
-                    <InputGroup style={{ width: '200px' }}>
-                      <InputGroup.Text><FaSearch /></InputGroup.Text>
-                      <Form.Control
-                        type="email"
-                        placeholder="Email"
-                        className="dark-input"
-                        value={searchEmail}
-                        onChange={(e) => handleSearchChange('email', e.target.value)}
+                        value={searchQuery}
+                        onChange={(e) => handleSearchChange(e.target.value)}
                       />
                     </InputGroup>
                     
@@ -556,22 +568,22 @@ const Customer = () => {
                   </div>
                 </div>
 
-                {/* Bulk Actions */}
+                  {/* Bulk Actions - hành động hàng loạt */}
                 {selectedCustomers.length > 0 && (
                   <div className="d-flex justify-content-between align-items-center mb-3 p-3 bg-warning bg-opacity-10 rounded-3">
                     <div className="text-white">
-                      <span className="me-3">Đã chọn {selectedCustomers.length} khách hàng</span>
+                      <span className="me-3 text-white">Đã chọn {selectedCustomers.length} khách hàng</span>
                       <Button variant="outline-danger" size="sm" onClick={handleBulkDelete}>
                         <FaTrash className="me-2" />Xóa đã chọn
                       </Button>
                     </div>
                     <Button variant="outline-secondary" size="sm" onClick={() => setSelectedCustomers([])}>
-                      Bỏ chọn
+                      <span className="text-white">Bỏ chọn</span>
                     </Button>
                   </div>
                 )}
 
-                {/* Customers Table */}
+                  {/* Customers Table - bảng dữ liệu khách hàng */}
                 {loading ? (
                   <div className="d-flex flex-column justify-content-center align-items-center py-5" style={{ minHeight: '400px' }}>
                     <div className="spinner-border text-warning" role="status" style={{ width: '3rem', height: '3rem' }}>
@@ -590,18 +602,12 @@ const Customer = () => {
                               <FaCheckSquare /> : <FaSquare />}
                           </Button>
                         </th>
-                        <th onClick={() => handleSort('id')} style={{ cursor: 'pointer' }}>
-                          ID {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}
-                        </th>
+                        <th>ID</th>
                         <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
                           Họ và tên {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
-                        <th onClick={() => handleSort('phone')} style={{ cursor: 'pointer' }}>
-                          Số điện thoại {sortField === 'phone' && (sortDirection === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th onClick={() => handleSort('email')} style={{ cursor: 'pointer' }}>
-                          Email {sortField === 'email' && (sortDirection === 'asc' ? '↑' : '↓')}
-                        </th>
+                        <th>Số điện thoại</th>
+                        <th>Email</th>
                         <th>Thao tác</th>
                       </tr>
                     </thead>
@@ -609,7 +615,7 @@ const Customer = () => {
                       {paginatedCustomers.length === 0 ? (
                         <tr>
                           <td colSpan="6" className="text-center py-5 text-white-50 fw-bold">
-                            {(searchPhone || searchName || searchEmail) ? 'Không tìm thấy khách hàng' : 'Chưa có dữ liệu khách hàng'}
+                            {(searchQuery) ? 'Không tìm thấy khách hàng' : 'Chưa có dữ liệu khách hàng'}
                           </td>
                         </tr>
                       ) : (
@@ -641,15 +647,15 @@ const Customer = () => {
                     </tbody>
                   </Table>
 
-                  {/* Pagination */}
+                  {/* Pagination controls - điều khiển phân trang */}
                   {totalPages > 1 && (
                     <div className="d-flex justify-content-between align-items-center mt-4">
                       <div className="d-flex align-items-center gap-3">
-                        <div className="text-white">
+                        <div className="text-warning fw-bold" style={{ fontSize: '16px' }}>
                           Hiển thị {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, sortedCustomers.length)} của {sortedCustomers.length} khách hàng
                         </div>
                         <div className="d-flex align-items-center gap-2">
-                          <span className="text-white">Hiển thị:</span>
+                          <span className="text-warning fw-bold" style={{ fontSize: '16px' }}>Hiển thị:</span>
                           <Form.Select 
                             value={itemsPerPage} 
                             onChange={(e) => setItemsPerPage(Number(e.target.value))}
@@ -691,7 +697,7 @@ const Customer = () => {
           </Col>
         </Row>
 
-        {/* Add/Edit Modal */}
+        {/* Add/Edit Modal - modal thêm/sửa khách hàng */}
         <Modal show={modalVisible} onHide={() => {
           setModalVisible(false);
           setEditingCustomer(null);
@@ -777,42 +783,61 @@ const Customer = () => {
           </Modal.Footer>
         </Modal>
 
-        {/* Customer Details Modal */}
-        <Modal show={detailModalVisible} onHide={() => setDetailModalVisible(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Chi tiết khách hàng</Modal.Title>
+        {/* Customer Details Modal - modal xem chi tiết khách hàng */}
+        <Modal show={detailModalVisible} onHide={() => setDetailModalVisible(false)} size="lg" style={{ zIndex: 9999 }}>
+          <Modal.Header className="bg-dark border-warning">
+            <Modal.Title className="text-warning fw-bold">
+              <FaUser className="me-2" />Chi tiết khách hàng
+            </Modal.Title>
           </Modal.Header>
-          <Modal.Body>
+          <Modal.Body className="bg-dark">
             {selectedCustomer && (
-              <div>
-                <div className="mb-3">
-                  <strong className="text-warning">ID:</strong>
-                  <span className="ms-2">#{selectedCustomer.id}</span>
-                </div>
-                <div className="mb-3">
-                  <strong className="text-warning">Họ và tên:</strong>
-                  <span className="ms-2">{selectedCustomer.name}</span>
-                </div>
-                <div className="mb-3">
-                  <strong className="text-warning">Số điện thoại:</strong>
-                  <span className="ms-2">{selectedCustomer.phone}</span>
-                </div>
-                <div className="mb-3">
-                  <strong className="text-warning">Email:</strong>
-                  <span className="ms-2">{selectedCustomer.email}</span>
+              <div className="p-3">
+                <div className="row">
+                  <div className="col-12">
+                    <div className="mb-3">
+                      <label className="text-warning fw-bold small mb-2 d-block">
+                        ID Khách hàng
+                      </label>
+                      <div className="text-white fs-5">#{selectedCustomer.id}</div>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <label className="text-warning fw-bold small mb-2 d-block">
+                        Họ và tên
+                      </label>
+                      <div className="text-white fs-5">{selectedCustomer.name}</div>
+                    </div>
+                    
+                    <div className="row">
+                      <div className="col-md-6 mb-3">
+                        <label className="text-warning fw-bold small mb-2 d-block">
+                          Số điện thoại
+                        </label>
+                        <div className="text-white fs-5">{selectedCustomer.phone}</div>
+                      </div>
+                      
+                      <div className="col-md-6 mb-3">
+                        <label className="text-warning fw-bold small mb-2 d-block">
+                          Email
+                        </label>
+                        <div className="text-white fs-5">{selectedCustomer.email}</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
           </Modal.Body>
-          <Modal.Footer>
+          <Modal.Footer className="bg-dark border-warning">
             <Button variant="secondary" onClick={() => setDetailModalVisible(false)}>
               Đóng
             </Button>
-            <Button variant="primary" onClick={() => {
+            <Button variant="warning" onClick={() => {
               setDetailModalVisible(false);
               handleEdit(selectedCustomer);
             }}>
-              <FaEdit className="me-2" />Sửa
+              <FaEdit className="me-2" />Sửa thông tin
             </Button>
           </Modal.Footer>
         </Modal>
