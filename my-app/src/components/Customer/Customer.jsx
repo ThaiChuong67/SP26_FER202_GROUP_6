@@ -205,19 +205,6 @@ const Customer = () => {
     });
   }, [customers, searchPhone, searchName, searchEmail]);
 
-  // Pagination
-  const paginatedCustomers = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return sortedCustomers.slice(startIndex, startIndex + itemsPerPage);
-  }, [sortedCustomers, currentPage, itemsPerPage]);
-
-  const totalPages = Math.ceil(sortedCustomers.length / itemsPerPage);
-
-  // Reset pagination when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchPhone, searchName, searchEmail, itemsPerPage]);
-
   // Sort customers
   const sortedCustomers = useMemo(() => {
     return [...filteredCustomers].sort((a, b) => {
@@ -236,6 +223,19 @@ const Customer = () => {
       }
     });
   }, [filteredCustomers, sortField, sortDirection]);
+
+  // Pagination
+  const paginatedCustomers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return sortedCustomers.slice(startIndex, startIndex + itemsPerPage);
+  }, [sortedCustomers, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(sortedCustomers.length / itemsPerPage);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchPhone, searchName, searchEmail, itemsPerPage]);
 
   // Phone validation - chỉ cho phép số
   const validatePhone = (phone) => {
