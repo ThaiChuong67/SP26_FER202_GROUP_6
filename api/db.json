@@ -20,20 +20,6 @@
       "password": "123",
       "fullName": "Trần Thị B",
       "role": "staff"
-    },
-    {
-      "id": "4",
-      "username": "staff3",
-      "password": "123",
-      "fullName": "Phạm Văn Tài",
-      "role": "staff"
-    },
-    {
-      "id": "5",
-      "username": "staff4",
-      "password": "123",
-      "fullName": "Lê Hoàng Phúc",
-      "role": "staff"
     }
   ],
   "services": [
@@ -114,56 +100,28 @@
       "name": "Sữa Rửa Mặt Tràm Trà Dr.FORSKIN Tea tree 100g - 100g",
       "price": 270000,
       "quantity": 20,
-      "description": "Sữa rửa mặt trị mụn chuyên sâu cho nam giới."
+      "description": ""
     },
     {
       "id": "2",
       "name": "Sáp vuốt tóc Glanzen Limited",
       "price": 400000,
       "quantity": 100,
-      "description": "Sáp vuốt tóc độ giữ nếp cực cao, không bóng."
+      "description": ""
     },
     {
       "id": "3",
       "name": "Xịt tạo kiểu tóc Glanzen X2 Booster 2025",
       "price": 280000,
       "quantity": 50,
-      "description": "Bảo vệ tóc khỏi nhiệt độ máy sấy, tăng độ phồng."
+      "description": ""
     },
     {
       "id": "4",
       "name": "Nhuộm tóc dược liệu Thái Dương",
       "price": 130000,
       "quantity": 299,
-      "description": "Thuốc nhuộm đen tóc chiết xuất từ thảo mộc."
-    },
-    {
-      "id": "5",
-      "name": "Gôm Xịt Tóc Butterfly Shadow",
-      "price": 120000,
-      "quantity": 150,
-      "description": "Gôm xịt giữ nếp cứng, định hình tóc form chuẩn."
-    },
-    {
-      "id": "6",
-      "name": "Sáp vuốt tóc Volcanic Clay",
-      "price": 320000,
-      "quantity": 80,
-      "description": "Sáp vuốt dạng đất sét khô, phù hợp chất tóc cứng."
-    },
-    {
-      "id": "7",
-      "name": "Tinh dầu dưỡng tóc Moroccanoil 25ml",
-      "price": 350000,
-      "quantity": 30,
-      "description": "Phục hồi tóc khô xơ, hư tổn do uốn nhuộm."
-    },
-    {
-      "name": "Bột tạo phồng tóc Osis+ Dust It",
-      "price": 250000,
-      "quantity": 45,
-      "description": "Rắc trực tiếp lên chân tóc để tăng độ phồng tối đa.",
-      "id": "8"
+      "description": ""
     }
   ],
   "customers": [
@@ -184,40 +142,16 @@
       "name": "Lê Văn C",
       "phone": "0923456789",
       "email": "levanc@email.com"
-    },
-    {
-      "id": "4",
-      "name": "Phạm Minh Đức",
-      "phone": "0934567890",
-      "email": "ducpham@gmail.com"
-    },
-    {
-      "id": "5",
-      "name": "Hoàng Tuấn Anh",
-      "phone": "0945678901",
-      "email": "tuananh_hoang@gmail.com"
-    },
-    {
-      "id": "6",
-      "name": "Vũ Hải Đăng",
-      "phone": "0956789012",
-      "email": "haidang.vu@email.com"
-    },
-    {
-      "id": "7",
-      "name": "Đặng Ngọc Sơn",
-      "phone": "0967890123",
-      "email": "sondang@email.com"
     }
   ],
   "orders": [
     {
-      "customerId": "1",
-      "serviceId": "4",
-      "productId": "1",
-      "date": "2026-03-10",
       "id": "e13e",
-      "totalPrice": 320000
+      "customerId": "1",
+      "serviceId": "1",
+      "productId": "1",
+      "date": "2026-03-18",
+      "totalPrice": 330000
     },
     {
       "id": "ORDmn2tma2i",
@@ -250,46 +184,6 @@
       "productId": "",
       "date": "2026-03-23",
       "totalPrice": 100000
-    },
-    {
-      "id": "ORDp9k2l1m4",
-      "customerId": "4",
-      "serviceId": "6",
-      "productId": "7",
-      "date": "2026-03-24",
-      "totalPrice": 600000
-    },
-    {
-      "id": "ORDq8j3n2x5",
-      "customerId": "5",
-      "serviceId": "2",
-      "productId": "6",
-      "date": "2026-03-24",
-      "totalPrice": 400000
-    },
-    {
-      "id": "ORDr7h4p3y6",
-      "customerId": "6",
-      "serviceId": "9",
-      "productId": "7",
-      "date": "2026-03-25",
-      "totalPrice": 700000
-    },
-    {
-      "id": "ORDt5f6r5w8",
-      "customerId": "1",
-      "serviceId": "5",
-      "productId": "",
-      "date": "2026-03-26",
-      "totalPrice": 40000
-    },
-    {
-      "id": "ORDmn69yu4u",
-      "customerId": "1",
-      "serviceId": "5",
-      "productId": "4",
-      "date": "2026-03-25",
-      "totalPrice": 170000
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
