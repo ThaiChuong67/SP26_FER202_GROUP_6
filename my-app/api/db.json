@@ -212,12 +212,12 @@
   ],
   "orders": [
     {
-      "id": "e13e",
       "customerId": "1",
-      "serviceId": "1",
+      "serviceId": "4",
       "productId": "1",
-      "date": "2026-03-18",
-      "totalPrice": 330000
+      "date": "2026-03-10",
+      "id": "e13e",
+      "totalPrice": 320000
     },
     {
       "id": "ORDmn2tma2i",
@@ -276,20 +276,20 @@
       "totalPrice": 700000
     },
     {
-      "id": "ORDs6g5q4z7",
-      "customerId": "7",
-      "serviceId": "3",
-      "productId": "2",
-      "date": "2026-03-25",
-      "totalPrice": 500000
-    },
-    {
       "id": "ORDt5f6r5w8",
       "customerId": "1",
       "serviceId": "5",
       "productId": "",
       "date": "2026-03-26",
       "totalPrice": 40000
+    },
+    {
+      "id": "ORDmn69yu4u",
+      "customerId": "1",
+      "serviceId": "5",
+      "productId": "4",
+      "date": "2026-03-25",
+      "totalPrice": 170000
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

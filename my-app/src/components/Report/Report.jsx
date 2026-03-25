@@ -9,13 +9,13 @@ const Report = () => {
   const [services, setServices] = useState([]); // Danh sách dịch vụ
   const [products, setProducts] = useState([]); // Danh sách sản phẩm
   const [customers, setCustomers] = useState([]); // Danh sách khách hàng
-  
+
   // State cho bộ lọc khoảng thời gian
   const [dateRange, setDateRange] = useState({
     startDate: '', // Ngày bắt đầu
     endDate: '' // Ngày kết thúc
   });
-  
+
   // State cho dữ liệu báo cáo đã xử lý
   const [reportData, setReportData] = useState({
     totalRevenue: 0, // Tổng doanh thu
@@ -65,7 +65,7 @@ const Report = () => {
     let filteredOrders = orders;
 
     // Lọc đơn hàng theo khoảng thời gian nếu có chỉ định
-    if (dateRange.startDate && dateRange.endDate) {
+ if (dateRange.startDate && dateRange.endDate) {
       filteredOrders = orders.filter(order => {
         return order.date >= dateRange.startDate && order.date <= dateRange.endDate;
       });
@@ -84,7 +84,7 @@ const Report = () => {
     // Tìm top 5 dịch vụ bán chạy nhất
     const serviceCount = {};
     filteredOrders.forEach(order => {
-      const serviceId = order.serviceId;
+  const serviceId = order.serviceId;
       serviceCount[serviceId] = (serviceCount[serviceId] || 0) + 1;
     });
 
@@ -93,7 +93,7 @@ const Report = () => {
       .map(([serviceId, count]) => {
         const service = services.find(s => s.id === serviceId);
         return {
-          name: service ? service.name : 'Unknown', // Tên dịch vụ
+   name: service ? service.name : 'Unknown', // Tên dịch vụ
           count: count, // Số lượt sử dụng
           revenue: filteredOrders
             .filter(order => order.serviceId === serviceId)
@@ -107,7 +107,7 @@ const Report = () => {
     const productCount = {};
     filteredOrders.forEach(order => {
       if (order.productId) {
-        productCount[order.productId] = (productCount[order.productId] || 0) + 1;
+  productCount[order.productId] = (productCount[order.productId] || 0) + 1;
       }
     });
 
@@ -163,8 +163,8 @@ const Report = () => {
     const today = new Date();
     let startDate = '';
     let endDate = today.toISOString().split('T')[0];
-    
-    switch(filter) {
+
+    switch (filter) {
       case 'today': {
         // Lọc cho hôm nay
         startDate = endDate;
@@ -189,7 +189,7 @@ const Report = () => {
         startDate = '';
         endDate = '';
     }
-    
+
     // Cập nhật state với khoảng thời gian đã chọn
     setDateRange({
       startDate,
@@ -228,19 +228,19 @@ TỔNG QUAN:
 - Tổng khách hàng: ${reportData.totalCustomers}
 
 DỊCH VỤ BÁN CHẠY NHẤT:
-${reportData.topServices.map((service, index) => 
-  `${index + 1}. ${service.name} - ${service.count} lượt - ${service.revenue.toLocaleString()} VNĐ`
-).join('\n')}
+${reportData.topServices.map((service, index) =>
+        `${index + 1}. ${service.name} - ${service.count} lượt - ${service.revenue.toLocaleString()} VNĐ`
+      ).join('\n')}
 
 SẢN PHẨM BÁN CHẠY NHẤT:
-${reportData.topProducts.map((product, index) => 
-  `${index + 1}. ${product.name} - ${product.count} lượt - ${product.revenue.toLocaleString()} VNĐ`
-).join('\n')}
+${reportData.topProducts.map((product, index) =>
+        `${index + 1}. ${product.name} - ${product.count} lượt - ${product.revenue.toLocaleString()} VNĐ`
+      ).join('\n')}
 
 DOANH THU THEO NGÀY:
-${reportData.revenueByDate.map(item => 
-  `${item.date}: ${item.revenue.toLocaleString()} VNĐ`
-).join('\n')}
+${reportData.revenueByDate.map(item =>
+        `${item.date}: ${item.revenue.toLocaleString()} VNĐ`
+      ).join('\n')}
     `;
 
       // Tạo file và tải về
@@ -254,7 +254,7 @@ ${reportData.revenueByDate.map(item =>
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-      
+
       console.log('Report exported successfully!');
     } catch (error) {
       console.error('Error exporting report:', error);
@@ -281,30 +281,30 @@ ${reportData.revenueByDate.map(item =>
       {/* Bộ lọc khoảng thời gian */}
       <div className="date-filter">
         <h3>Khoảng thời gian</h3>
-        
+
         {/* Các nút bộ lọc nhanh */}
         <div className="quick-filters">
-          <button 
+          <button
             className={`quick-filter-btn ${quickFilter === 'today' ? 'active' : ''}`}
             onClick={() => handleQuickFilter('today')}
           >
             Hôm nay
           </button>
-          <button 
+          <button
             className={`quick-filter-btn ${quickFilter === '7days' ? 'active' : ''}`}
             onClick={() => handleQuickFilter('7days')}
           >
             7 ngày
           </button>
-          <button 
+          <button
             className={`quick-filter-btn ${quickFilter === '30days' ? 'active' : ''}`}
             onClick={() => handleQuickFilter('30days')}
           >
             30 ngày
           </button>
-          <button 
+          <button
             className={`quick-filter-btn ${quickFilter === 'custom' ? 'active' : ''}`}
-            onClick={() => {setQuickFilter('custom'); setDateRange({startDate: '', endDate: ''});}}
+            onClick={() => { setQuickFilter('custom'); setDateRange({ startDate: '', endDate: '' }); }}
           >
             Tùy chọn
           </button>
@@ -442,20 +442,20 @@ ${reportData.revenueByDate.map(item =>
       </div>
 
       {/* Doanh thu theo ngày */}
-        <div className="revenue-timeline">
-          <h3>Doanh thu theo ngày</h3>
-          <div className="timeline">
-            {reportData.revenueByDate.map((item, index) => (
-              <div key={index} className="timeline-item">
-                <span className="date">{formatDate(item.date)}</span>
-                <span className="revenue">{formatCurrency(item.revenue)} VNĐ</span>
-              </div>
-            ))}
-            {reportData.revenueByDate.length === 0 && (
-              <p className="no-data">Chưa có dữ liệu doanh thu</p>
-            )}
-          </div>
+      <div className="revenue-timeline">
+        <h3>Doanh thu theo ngày</h3>
+        <div className="timeline">
+          {reportData.revenueByDate.map((item, index) => (
+            <div key={index} className="timeline-item">
+              <span className="date">{formatDate(item.date)}</span>
+              <span className="revenue">{formatCurrency(item.revenue)} VNĐ</span>
+            </div>
+          ))}
+          {reportData.revenueByDate.length === 0 && (
+            <p className="no-data">Chưa có dữ liệu doanh thu</p>
+          )}
         </div>
+      </div>
 
       {/* CSS styles cho component */}
       <style>{`

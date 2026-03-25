@@ -3,23 +3,26 @@ import axios from 'axios';
 import { FaFileInvoiceDollar, FaPlus, FaSearch, FaEdit, FaTrash, FaBolt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 
+// Component chính cho trang quản lý đơn hàng
 const Order = () => {
-  const [orders, setOrders] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [services, setServices] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingOrder, setEditingOrder] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  // State để lưu trữ dữ liệu từ API
+  const [orders, setOrders] = useState([]); // Danh sách đơn hàng
+  const [customers, setCustomers] = useState([]); // Danh sách khách hàng
+  const [services, setServices] = useState([]); // Danh sách dịch vụ
+  const [products, setProducts] = useState([]); // Danh sách sản phẩm
+  const [showForm, setShowForm] = useState(false); // Hiển thị/ẩn form tạo đơn hàng
+  const [editingOrder, setEditingOrder] = useState(null); // Đơn hàng đang được chỉnh sửa
+  const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm
 
-  // Form state
+  // State cho dữ liệu form
   const [formData, setFormData] = useState({
-    customerId: '',
-    serviceId: '',
-    productId: '',
-    date: new Date().toISOString().split('T')[0]
+    customerId: '', // ID khách hàng được chọn
+    serviceId: '', // ID dịch vụ được chọn
+    productId: '', // ID sản phẩm được chọn
+    date: new Date().toISOString().split('T')[0] // Ngày mặc định là hôm nay
   });
 
+  // Cấu hình SweetAlert với style tùy chỉnh
   const premiumSwal = Swal.mixin({
     customClass: {
       confirmButton: 'btn btn-warning btn-lg px-5 fw-bold rounded-3 shadow-sm text-dark ms-3',
@@ -28,19 +31,23 @@ const Order = () => {
     buttonsStyling: false
   });
 
+  // useEffect để fetch dữ liệu khi component được mount
   useEffect(() => {
     fetchData();
   }, []);
 
+  // Hàm fetch dữ liệu từ API JSON Server
   const fetchData = async () => {
     try {
+      // Gọi song song nhiều API để tăng performance
       const [ordersRes, customersRes, servicesRes, productsRes] = await Promise.all([
-        axios.get('http://localhost:5000/orders'),
-        axios.get('http://localhost:5000/customers'),
-        axios.get('http://localhost:5000/services'),
-        axios.get('http://localhost:5000/products')
+        axios.get('http://localhost:5000/orders'), // Lấy danh sách đơn hàng
+        axios.get('http://localhost:5000/customers'), // Lấy danh sách khách hàng
+        axios.get('http://localhost:5000/services'), 
+        axios.get('http://localhost:5000/products') 
       ]);
 
+      // Cập nhật state với dữ liệu từ API
       setOrders(ordersRes.data);
       setCustomers(customersRes.data);
       setServices(servicesRes.data);
@@ -50,14 +57,17 @@ const Order = () => {
     }
   };
 
+  // Hàm tính tổng tiền đơn hàng (dịch vụ + sản phẩm)
   const calculateTotalPrice = () => {
     let total = 0;
     
+    // Tìm và cộng giá dịch vụ
     const service = services.find(s => s.id === formData.serviceId);
     if (service) {
       total += service.price;
     }
     
+    // Tìm và cộng giá sản phẩm (nếu có)
     const product = products.find(p => p.id === formData.productId);
     if (product) {
       total += product.price;
@@ -66,30 +76,36 @@ const Order = () => {
     return total;
   };
 
+  // Hàm xử lý submit form (tạo mới hoặc cập nhật đơn hàng)
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate form: phải có khách hàng và dịch vụ
     if (!formData.customerId || !formData.serviceId) {
       premiumSwal.fire('Lỗi!', 'Vui lòng chọn khách hàng và dịch vụ!', 'error');
       return;
     }
 
+    // Chuẩn bị dữ liệu đơn hàng
     const orderData = {
       ...formData,
-      id: editingOrder ? editingOrder.id : 'ORD' + Date.now().toString(36).slice(-8), // ID ngẫu nhiên
-      totalPrice: calculateTotalPrice(),
-      date: formData.date || new Date().toISOString().split('T')[0]
+      id: editingOrder ? editingOrder.id : 'ORD' + Date.now().toString(36).slice(-8), // ID ngẫu nhiên cho đơn mới
+      totalPrice: calculateTotalPrice(), // Tính tổng tiền
+      date: formData.date || new Date().toISOString().split('T')[0] // Ngày đơn hàng
     };
 
     try {
       if (editingOrder) {
+        // Cập nhật đơn hàng hiện có
         await axios.put(`http://localhost:5000/orders/${editingOrder.id}`, orderData);
         premiumSwal.fire('Thành công!', 'Cập nhật đơn hàng thành công!', 'success');
       } else {
+        // Tạo đơn hàng mới
         await axios.post('http://localhost:5000/orders', orderData);
         premiumSwal.fire('Thành công!', 'Tạo đơn hàng thành công!', 'success');
       }
       
+      // Reset form và fetch lại dữ liệu
       resetForm();
       fetchData();
     } catch (error) {
@@ -98,7 +114,9 @@ const Order = () => {
     }
   };
 
+  // Hàm xử lý khi nhấn nút sửa
   const handleEdit = (order) => {
+    // Đặt đơn hàng đang sửa và điền dữ liệu vào form
     setEditingOrder(order);
     setFormData({
       customerId: order.customerId,
@@ -106,14 +124,17 @@ const Order = () => {
       productId: order.productId || '',
       date: order.date
     });
-    setShowForm(true);
+    setShowForm(true); // Hiển thị form
   };
 
+  // Hàm xử lý xóa đơn hàng
   const handleDelete = async (id) => {
+    // Tìm thông tin đơn hàng để hiển thị trong dialog xác nhận
     const order = orders.find(o => o.id === id);
     const customerName = getCustomerName(order?.customerId);
     const serviceName = getServiceName(order?.serviceId);
     
+    // Hiển thị dialog xác nhận xóa
     premiumSwal.fire({
       title: 'Xác nhận xóa?',
       html: `Bạn có chắc chắn muốn xóa đơn hàng <strong>#${order?.id || ''}</strong>?<br>
@@ -128,9 +149,10 @@ const Order = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          // Gọi API xóa đơn hàng
           await axios.delete(`http://localhost:5000/orders/${id}`);
           premiumSwal.fire('Đã xóa!', 'Đơn hàng đã được xóa thành công.', 'success');
-          fetchData();
+          fetchData(); // Fetch lại dữ liệu
         } catch (error) {
           premiumSwal.fire('Lỗi!', 'Lỗi khi xóa đơn hàng', 'error');
         }
@@ -138,6 +160,7 @@ const Order = () => {
     });
   };
 
+  // Hàm reset form về trạng thái ban đầu
   const resetForm = () => {
     setFormData({
       customerId: '',
@@ -145,15 +168,18 @@ const Order = () => {
       productId: '',
       date: new Date().toISOString().split('T')[0]
     });
-    setEditingOrder(null);
-    setShowForm(false);
+    setEditingOrder(null); // Xóa trạng thái edit
+    setShowForm(false); // Ẩn form
   };
 
+  // Lọc đơn hàng theo từ khóa tìm kiếm
   const filteredOrders = orders.filter(order => {
+    // Tìm thông tin khách hàng và dịch vụ
     const customer = customers.find(c => c.id === order.customerId);
     const service = services.find(s => s.id === order.serviceId);
     const searchLower = searchTerm.toLowerCase();
     
+    // Kiểm tra xem từ khóa có trong tên khách hàng, tên dịch vụ, hoặc ngày không
     return (
       customer?.name.toLowerCase().includes(searchLower) ||
       service?.name.toLowerCase().includes(searchLower) ||
@@ -161,24 +187,29 @@ const Order = () => {
     );
   });
 
+  // Hàm lấy tên khách hàng từ ID
   const getCustomerName = (customerId) => {
     const customer = customers.find(c => c.id === customerId);
     return customer ? customer.name : 'Unknown';
   };
 
+  // Hàm lấy tên dịch vụ từ ID
   const getServiceName = (serviceId) => {
     const service = services.find(s => s.id === serviceId);
     return service ? service.name : 'Unknown';
   };
 
+  // Hàm lấy tên sản phẩm từ ID
   const getProductName = (productId) => {
-    if (!productId) return 'Không có';
+    if (!productId) return 'Không có'; // Nếu không có sản phẩm
     const product = products.find(p => p.id === productId);
     return product ? product.name : 'Unknown';
   };
 
+  // Render UI component
   return (
     <div className="order-management">
+      {/* Header của trang quản lý đơn hàng */}
       <div className="page-header">
         <div className="header-left">
           <h1 className="page-title">
@@ -197,6 +228,7 @@ const Order = () => {
         </div>
       </div>
 
+      {/* Phần tìm kiếm và tạo đơn hàng mới */}
       <div className="order-actions">
         <div className="search-section">
           <FaSearch className="search-icon" />
@@ -216,11 +248,13 @@ const Order = () => {
         </button>
       </div>
 
+      {/* Form tạo/cập nhật đơn hàng (overlay) */}
       {showForm && (
         <div className="order-form-overlay">
           <div className="order-form">
             <h3>{editingOrder ? 'Cập Nhật Đơn hàng' : 'Tạo Đơn hàng Mới'}</h3>
             <form onSubmit={handleSubmit}>
+              {/* Chọn khách hàng */}
               <div className="form-group">
                 <label>Khách hàng:</label>
                 <select
@@ -237,6 +271,7 @@ const Order = () => {
                 </select>
               </div>
 
+              {/* Chọn dịch vụ */}
               <div className="form-group">
                 <label>Dịch vụ:</label>
                 <select
@@ -253,6 +288,7 @@ const Order = () => {
                 </select>
               </div>
 
+              {/* Chọn sản phẩm (tùy chọn) */}
               <div className="form-group">
                 <label>Sản phẩm (tùy chọn):</label>
                 <select
@@ -268,6 +304,7 @@ const Order = () => {
                 </select>
               </div>
 
+              {/* Chọn ngày */}
               <div className="form-group">
                 <label>Ngày:</label>
                 <input
@@ -278,6 +315,7 @@ const Order = () => {
                 />
               </div>
 
+              {/* Hiển thị tổng tiền (read-only) */}
               <div className="form-group">
                 <label>Tổng tiền:</label>
                 <input
@@ -288,6 +326,7 @@ const Order = () => {
                 />
               </div>
 
+              {/* Nút hành động */}
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">
                   {editingOrder ? 'Cập Nhật' : 'Tạo Đơn hàng'}
@@ -301,6 +340,7 @@ const Order = () => {
         </div>
       )}
 
+      {/* Danh sách đơn hàng */}
       <div className="order-list">
         <div className="data-table-container">
           <table className="data-table">
@@ -316,6 +356,7 @@ const Order = () => {
               </tr>
             </thead>
             <tbody>
+              {/* Hiển thị danh sách đơn hàng đã lọc */}
               {filteredOrders.map(order => (
                 <tr key={order.id}>
                   <td>{order.id}</td>
@@ -325,12 +366,14 @@ const Order = () => {
                   <td>{order.totalPrice?.toLocaleString()} VNĐ</td>
                   <td>{order.date}</td>
                   <td>
+                    {/* Nút sửa */}
                     <button 
                       className="btn-action btn-edit"
                       onClick={() => handleEdit(order)}
                     >
                       <FaEdit /> Sửa
                     </button>
+                    {/* Nút xóa */}
                     <button 
                       className="btn-action btn-delete"
                       onClick={() => handleDelete(order.id)}
@@ -344,6 +387,7 @@ const Order = () => {
           </table>
         </div>
         
+        {/* Hiển thị thông báo khi không có dữ liệu */}
         {filteredOrders.length === 0 && (
           <div className="no-data">
             {searchTerm ? 'Không tìm thấy đơn hàng nào.' : 'Chưa có đơn hàng nào.'}
@@ -351,14 +395,17 @@ const Order = () => {
         )}
       </div>
 
+      {/* CSS styles cho component */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;700;900&display=swap');
 
+        /* Styles chính cho container */
         .order-management {
           font-family: 'Montserrat', sans-serif;
           color: #fff;
         }
 
+        /* Header styles */
         .page-header {
           display: flex;
           justify-content: space-between;
@@ -390,6 +437,7 @@ const Order = () => {
           font-size: 2.5rem;
         }
 
+        /* Badge live data */
         .live-badge {
           background: #ffc107;
           color: #000;
@@ -413,6 +461,7 @@ const Order = () => {
           font-size: 0.9rem;
         }
 
+        /* System status */
         .system-status {
           display: flex;
           align-items: center;
@@ -440,6 +489,7 @@ const Order = () => {
           font-size: 0.9rem;
         }
 
+        /* Phần tìm kiếm và tạo đơn hàng */
         .order-actions {
           display: flex;
           justify-content: space-between;
@@ -448,6 +498,7 @@ const Order = () => {
           gap: 20px;
         }
 
+        /* Search section */
         .search-section {
           display: flex;
           align-items: center;
@@ -478,6 +529,7 @@ const Order = () => {
           color: #666;
         }
 
+        /* Nút tạo đơn hàng */
         .btn-create-order {
           background: #ffc107;
           color: #000;
@@ -501,6 +553,7 @@ const Order = () => {
           box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
         }
 
+        /* Form overlay */
         .order-form-overlay {
           position: fixed;
           top: 0;
@@ -514,6 +567,7 @@ const Order = () => {
           z-index: 1000;
         }
 
+        /* Form styles */
         .order-form {
           background: #1a1a1a;
           border: 1px solid #333;
@@ -532,6 +586,7 @@ const Order = () => {
           letter-spacing: 1px;
         }
 
+        /* Form group styles */
         .form-group {
           margin-bottom: 20px;
         }
@@ -560,12 +615,14 @@ const Order = () => {
           border-color: #ffc107;
         }
 
+        /* Total price display */
         .total-price-display {
           background: #0d0d0d;
           color: #28a745;
           font-weight: bold;
         }
 
+        /* Form actions */
         .form-actions {
           display: flex;
           gap: 10px;
@@ -590,6 +647,7 @@ const Order = () => {
           color: #fff;
         }
 
+        /* Data table container */
         .data-table-container {
           background: #1a1a1a;
           border-radius: 12px;
@@ -597,6 +655,7 @@ const Order = () => {
           border: 1px solid #333;
         }
 
+        /* Data table styles */
         .data-table {
           width: 100%;
           border-collapse: collapse;
@@ -626,6 +685,7 @@ const Order = () => {
           background: rgba(255, 193, 7, 0.1);
         }
 
+        /* Action buttons */
         .btn-action {
           padding: 6px 12px;
           border: none;
@@ -648,6 +708,7 @@ const Order = () => {
           color: #fff;
         }
 
+        /* No data message */
         .no-data {
           text-align: center;
           padding: 40px;
