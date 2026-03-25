@@ -644,8 +644,24 @@ const Customer = () => {
                   {/* Pagination */}
                   {totalPages > 1 && (
                     <div className="d-flex justify-content-between align-items-center mt-4">
-                      <div className="text-white">
-                        Hiển thị {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, sortedCustomers.length)} của {sortedCustomers.length} khách hàng
+                      <div className="d-flex align-items-center gap-3">
+                        <div className="text-white">
+                          Hiển thị {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, sortedCustomers.length)} của {sortedCustomers.length} khách hàng
+                        </div>
+                        <div className="d-flex align-items-center gap-2">
+                          <span className="text-white">Hiển thị:</span>
+                          <Form.Select 
+                            value={itemsPerPage} 
+                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                            style={{ width: '80px' }}
+                            className="dark-input"
+                          >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                          </Form.Select>
+                        </div>
                       </div>
                       <Pagination className="mb-0">
                         <Pagination.Prev 
