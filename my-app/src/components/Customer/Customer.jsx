@@ -44,7 +44,7 @@ const Customer = () => {
   };
 
   // ============= VALIDATION FUNCTIONS =============
-  // Email validation regex - chỉ cho phép ký tự hợp lệ
+  // Email validation regex - chỉ cho phép ký tự Latin
   const validateEmail = (email) => {
     // Chỉ cho phép letters, numbers, @, ., -, _ 
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -116,8 +116,18 @@ const Customer = () => {
         await axios.put(`http://localhost:5000/customers/${editingCustomer.id}`, formData);
         premiumSwal.fire('Thành công!', 'Cập nhật khách hàng thành công!', 'success');
       } else {
-        // Add new customer
-        await axios.post('http://localhost:5000/customers', formData);
+        // Add new customer with sequential ID
+        // Tìm ID lớn nhất hiện tại và +1 để tạo ID tuần tự
+        const maxId = Math.max(...customers.map(c => {
+          const id = parseInt(c.id);
+          return isNaN(id) ? 0 : id;
+        }));
+        const newId = (maxId + 1).toString();
+        
+        await axios.post('http://localhost:5000/customers', { 
+          ...formData, 
+          id: newId 
+        });
         premiumSwal.fire('Thành công!', 'Thêm khách hàng thành công!', 'success');
       }
       
@@ -247,11 +257,9 @@ const Customer = () => {
     }
     // Nếu là name field, chỉ cho phép letters và khoảng trắng
     else if (name === 'name') {
-      // Cho phép nhập letters, spaces, và ký tự tiếng Việt
-      const validNameChars = /^[a-zA-ZàáạảãăằắẳẵằẳấâầấậẫẫêềếệễễôồốổỗỗơờớởỡỡùúủũũưừứửữựỳýỷỹỵĂÂÊÔƠƯĐ\s]*$/;
-      if (value === '' || validNameChars.test(value)) {
-        setFormData(prev => ({ ...prev, [name]: value }));
-      }
+      // Cho phép nhập tất cả ký tự Unicode (tiếng Việt, Telex, VNI, etc.)
+      // Không giới hạn ký tự để người dùng tự do nhập
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
     else {
       setFormData(prev => ({ ...prev, [name]: value }));
