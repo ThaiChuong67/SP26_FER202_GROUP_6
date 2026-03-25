@@ -54,30 +54,37 @@ const Customer = () => {
     return re.test(String(email).toLowerCase());
   };
 
-  // Handle form submit
+  // Handle form submit with enhanced validation
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Reset errors
+    setFormErrors({});
+    
+    const errors = {};
+    
     // Validate tên khách hàng
     if (!formData.name || formData.name.trim().length < 2) {
-      premiumSwal.fire('Lỗi!', 'Tên khách hàng phải có ít nhất 2 ký tự!', 'error');
-      return;
+      errors.name = 'Tên khách hàng phải có ít nhất 2 ký tự!';
+    } else if (formData.name.trim().length > 100) {
+      errors.name = 'Tên khách hàng không được quá 100 ký tự!';
     }
 
     // Validate email
     if (!validateEmail(formData.email)) {
-      premiumSwal.fire('Lỗi!', 'Email không đúng định dạng!', 'error');
-      return;
+      errors.email = 'Email không đúng định dạng!';
     }
 
     // Validate phone - chỉ cho phép số và độ dài 10-11
     if (!validatePhone(formData.phone)) {
-      premiumSwal.fire('Lỗi!', 'Số điện thoại chỉ được chứa ký tự số!', 'error');
-      return;
+      errors.phone = 'Số điện thoại chỉ được chứa ký tự số!';
+    } else if (formData.phone.length < 10 || formData.phone.length > 11) {
+      errors.phone = 'Số điện thoại phải có 10-11 chữ số!';
     }
 
-    if (formData.phone.length < 10 || formData.phone.length > 11) {
-      premiumSwal.fire('Lỗi!', 'Số điện thoại phải có 10-11 chữ số!', 'error');
+    // If there are errors, set them and return
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
@@ -85,13 +92,16 @@ const Customer = () => {
     if (!editingCustomer) {
       const existingCustomerByPhone = customers.find(customer => customer.phone === formData.phone);
       if (existingCustomerByPhone) {
-        premiumSwal.fire('Lỗi!', 'Số điện thoại này đã tồn tại trong hệ thống!', 'error');
-        return;
+        errors.phone = 'Số điện thoại này đã tồn tại trong hệ thống!';
       }
 
       const existingCustomerByEmail = customers.find(customer => customer.email === formData.email);
       if (existingCustomerByEmail) {
-        premiumSwal.fire('Lỗi!', 'Email này đã tồn tại trong hệ thống!', 'error');
+        errors.email = 'Email này đã tồn tại trong hệ thống!';
+      }
+      
+      if (Object.keys(errors).length > 0) {
+        setFormErrors(errors);
         return;
       }
     }
@@ -110,6 +120,7 @@ const Customer = () => {
       setModalVisible(false);
       setEditingCustomer(null);
       setFormData({ name: '', phone: '', email: '' });
+      setFormErrors({});
       fetchCustomers();
     } catch (error) {
       premiumSwal.fire('Lỗi!', 'Lỗi khi lưu khách hàng', 'error');
@@ -153,6 +164,7 @@ const Customer = () => {
   const handleAdd = () => {
     setEditingCustomer(null);
     setFormData({ name: '', phone: '', email: '' });
+    setFormErrors({});
     setModalVisible(true);
   };
 
@@ -632,6 +644,7 @@ const Customer = () => {
           setModalVisible(false);
           setEditingCustomer(null);
           setFormData({ name: '', phone: '', email: '' });
+          setFormErrors({});
         }}>
           <Modal.Header closeButton>
             <Modal.Title>
@@ -648,9 +661,14 @@ const Customer = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   placeholder="Nhập họ và tên khách hàng"
-                  className="dark-input"
+                  className={`dark-input ${formErrors.name ? 'is-invalid' : ''}`}
                   required
                 />
+                {formErrors.name && (
+                  <div className="invalid-feedback d-block text-danger">
+                    {formErrors.name}
+                  </div>
+                )}
               </Form.Group>
 
               <Form.Group className="mb-3">
@@ -663,9 +681,14 @@ const Customer = () => {
                   value={formData.phone}
                   onChange={handleInputChange}
                   placeholder="Nhập số điện thoại"
-                  className="dark-input"
+                  className={`dark-input ${formErrors.phone ? 'is-invalid' : ''}`}
                   required
                 />
+                {formErrors.phone && (
+                  <div className="invalid-feedback d-block text-danger">
+                    {formErrors.phone}
+                  </div>
+                )}
               </Form.Group>
 
               <Form.Group className="mb-4">
@@ -676,9 +699,14 @@ const Customer = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="Nhập email"
-                  className="dark-input"
+                  className={`dark-input ${formErrors.email ? 'is-invalid' : ''}`}
                   required
                 />
+                {formErrors.email && (
+                  <div className="invalid-feedback d-block text-danger">
+                    {formErrors.email}
+                  </div>
+                )}
               </Form.Group>
             </Form>
           </Modal.Body>
@@ -687,6 +715,7 @@ const Customer = () => {
               setModalVisible(false);
               setEditingCustomer(null);
               setFormData({ name: '', phone: '', email: '' });
+              setFormErrors({});
             }}>
               Hủy
             </Button>
