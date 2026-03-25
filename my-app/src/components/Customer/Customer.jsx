@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Modal, Form, InputGroup, Table, Card } from 'react-bootstrap';
-import { FaSearch, FaPlus, FaEdit, FaTrash, FaUser } from 'react-icons/fa';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Container, Row, Col, Button, Modal, Form, InputGroup, Table, Card, Pagination } from 'react-bootstrap';
+import { FaSearch, FaPlus, FaEdit, FaTrash, FaUser, FaEye, FaFileExport, FaCheckSquare, FaSquare } from 'react-icons/fa';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
@@ -8,9 +8,19 @@ const Customer = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [searchPhone, setSearchPhone] = useState('');
+  const [searchName, setSearchName] = useState('');
+  const [searchEmail, setSearchEmail] = useState('');
   const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
+  const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [sortField, setSortField] = useState('id');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [formErrors, setFormErrors] = useState({});
 
   const premiumSwal = Swal.mixin({
     customClass: {
