@@ -193,6 +193,19 @@ const Customer = () => {
     });
   }, [customers, searchPhone, searchName, searchEmail]);
 
+  // Pagination
+  const paginatedCustomers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return sortedCustomers.slice(startIndex, startIndex + itemsPerPage);
+  }, [sortedCustomers, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(sortedCustomers.length / itemsPerPage);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchPhone, searchName, searchEmail, itemsPerPage]);
+
   // Sort customers
   const sortedCustomers = useMemo(() => {
     return [...filteredCustomers].sort((a, b) => {
@@ -448,6 +461,7 @@ const Customer = () => {
                     <h6 className="text-warning mt-4 tracking-widest text-uppercase" style={{ letterSpacing: '3px' }}>ĐANG TẢI DỮ LIỆU...</h6>
                   </div>
                 ) : (
+                  <>
                   <Table responsive hover className="luxury-table align-middle">
                     <thead>
                       <tr>
@@ -467,14 +481,14 @@ const Customer = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {sortedCustomers.length === 0 ? (
+                      {paginatedCustomers.length === 0 ? (
                         <tr>
                           <td colSpan="5" className="text-center py-5 text-white-50 fw-bold">
                             {(searchPhone || searchName || searchEmail) ? 'Không tìm thấy khách hàng' : 'Chưa có dữ liệu khách hàng'}
                           </td>
                         </tr>
                       ) : (
-                        sortedCustomers.map((customer) => (
+                        paginatedCustomers.map((customer) => (
                           <tr key={customer.id}>
                             <td className="fw-bold text-warning">#{customer.id}</td>
                             <td className="fw-semibold">{customer.name}</td>
@@ -493,6 +507,35 @@ const Customer = () => {
                       )}
                     </tbody>
                   </Table>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="d-flex justify-content-between align-items-center mt-4">
+                      <div className="text-white">
+                        Hiển thị {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, sortedCustomers.length)} của {sortedCustomers.length} khách hàng
+                      </div>
+                      <Pagination className="mb-0">
+                        <Pagination.Prev 
+                          disabled={currentPage === 1} 
+                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        />
+                        {[...Array(totalPages)].map((_, index) => (
+                          <Pagination.Item
+                            key={index + 1}
+                            active={index + 1 === currentPage}
+                            onClick={() => setCurrentPage(index + 1)}
+                          >
+                            {index + 1}
+                          </Pagination.Item>
+                        ))}
+                        <Pagination.Next 
+                          disabled={currentPage === totalPages} 
+                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        />
+                      </Pagination>
+                    </div>
+                  )}
+                  </>
                 )}
               </Card.Body>
             </Card>
