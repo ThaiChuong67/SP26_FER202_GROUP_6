@@ -214,6 +214,12 @@
       "name": "Ngô Kim Trâm",
       "phone": "0912345777",
       "email": "kimtram123@gmail.com"
+    },
+    {
+      "id": "9",
+      "name": "Bùi Minh Anh",
+      "phone": "0912312482",
+      "email": "anhminh@gmail.com"
     }
   ],
   "orders": [
@@ -296,6 +302,22 @@
       "productId": "4",
       "date": "2026-03-25",
       "totalPrice": 170000
+    },
+    {
+      "customerId": "1",
+      "serviceId": "2",
+      "productId": "1",
+      "date": "2026-03-28",
+      "id": "vrfapmjlQwI",
+      "totalPrice": 350000
+    },
+    {
+      "customerId": "4",
+      "serviceId": "1",
+      "productId": "",
+      "date": "2026-03-25",
+      "id": "lMqGdYS-RKY",
+      "totalPrice": 60000
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

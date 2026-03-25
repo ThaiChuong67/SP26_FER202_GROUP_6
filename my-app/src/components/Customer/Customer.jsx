@@ -16,7 +16,7 @@ const Customer = () => {
   const [formData, setFormData] = useState({ name: '', phone: '', email: '' }); // Dữ liệu form
   const [selectedCustomers, setSelectedCustomers] = useState([]); // Danh sách khách hàng đã chọn (bulk operations)
   const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Số item mỗi trang
+  const [itemsPerPage, setItemsPerPage] = useState(5); // Số item mỗi trang
   const [sortField, setSortField] = useState('id'); // Trường đang sắp xếp
   const [sortDirection, setSortDirection] = useState('asc'); // Chiều sắp xếp (asc/desc)
   const [formErrors, setFormErrors] = useState({}); // Lỗi form validation
@@ -61,12 +61,12 @@ const Customer = () => {
   // Handle form submit với enhanced validation
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Reset errors
     setFormErrors({});
-    
+
     const errors = {};
-    
+
     // Validate tên khách hàng
     if (!formData.name || formData.name.trim().length < 2) {
       errors.name = 'Tên khách hàng phải có ít nhất 2 ký tự!';
@@ -103,7 +103,7 @@ const Customer = () => {
       if (existingCustomerByEmail) {
         errors.email = 'Email này đã tồn tại trong hệ thống!';
       }
-      
+
       if (Object.keys(errors).length > 0) {
         setFormErrors(errors);
         return;
@@ -123,14 +123,14 @@ const Customer = () => {
           return isNaN(id) ? 0 : id;
         }));
         const newId = (maxId + 1).toString();
-        
-        await axios.post('http://localhost:5000/customers', { 
-          ...formData, 
-          id: newId 
+
+        await axios.post('http://localhost:5000/customers', {
+          ...formData,
+          id: newId
         });
         premiumSwal.fire('Thành công!', 'Thêm khách hàng thành công!', 'success');
       }
-      
+
       setModalVisible(false);
       setEditingCustomer(null);
       setFormData({ name: '', phone: '', email: '' });
@@ -144,7 +144,7 @@ const Customer = () => {
   // Handle delete khách hàng
   const handleDelete = async (id) => {
     const customer = customers.find(c => c.id === id);
-    
+
     premiumSwal.fire({
       title: 'Xác nhận xóa?',
       html: `Bạn có chắc chắn muốn xóa khách hàng <strong>${customer?.name || ''}</strong>?<br><small>Số điện thoại: ${customer?.phone || ''}</small>`,
@@ -214,12 +214,12 @@ const Customer = () => {
     return [...filteredCustomers].sort((a, b) => {
       let aValue = a[sortField];
       let bValue = b[sortField];
-      
+
       if (typeof aValue === 'string') {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
       }
-      
+
       if (sortDirection === 'asc') {
         return aValue > bValue ? 1 : -1;
       } else {
@@ -240,13 +240,13 @@ const Customer = () => {
   // Handle input change with validation - xử lý input với validation
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Nếu là phone field, chỉ cho phép nhập số
     if (name === 'phone') {
       if (value === '' || validatePhone(value)) {
         setFormData(prev => ({ ...prev, [name]: value }));
       }
-    } 
+    }
     // Nếu là email field, chỉ cho phép ký tự hợp lệ
     else if (name === 'email') {
       // Cho phép nhập ký tự hợp lệ cho email
@@ -351,7 +351,7 @@ const Customer = () => {
     const headers = Object.keys(dataToExport[0] || {});
     const csvContent = [
       headers.join(','),
-      ...dataToExport.map(row => 
+      ...dataToExport.map(row =>
         headers.map(header => `"${row[header]}"`).join(',')
       )
     ].join('\n');
@@ -372,8 +372,8 @@ const Customer = () => {
 
   // Handle select individual - chọn/bỏ chọn một khách hàng
   const handleSelectCustomer = (id) => {
-    setSelectedCustomers(prev => 
-      prev.includes(id) 
+    setSelectedCustomers(prev =>
+      prev.includes(id)
         ? prev.filter(customerId => customerId !== id)
         : [...prev, id]
     );
@@ -541,6 +541,39 @@ const Customer = () => {
           z-index: 10000 !important;
           position: relative !important;
         }
+          .pagination-luxury { 
+    display: inline-flex;
+    border-radius: 12px;
+    overflow: hidden; 
+    border: 1px solid rgba(255, 193, 7, 0.2) !important;
+    margin-bottom: 20px;
+}
+
+.pagination-luxury .page-link { 
+    background: #0d0d0d !important; 
+    color: #fff !important; 
+    margin: 0 !important; 
+    padding: 10px 18px !important;
+    border: none !important;
+    border-right: 1px solid rgba(255, 193, 7, 0.1) !important;
+    border-radius: 0 !important;
+    transition: all 0.3s;
+}
+
+.pagination-luxury .page-item:last-child .page-link {
+    border-right: none !important;
+}
+
+.pagination-luxury .page-item.active .page-link { 
+    background: #ffc107 !important; 
+    color: #000 !important; 
+    font-weight: 800 !important;
+    box-shadow: none !important;
+}
+
+.pagination-luxury .page-link:hover:not(.active) { 
+    background: rgba(255, 193, 7, 0.2) !important;
+}
       `}</style>
 
       <Container fluid className="customer-wrapper">
@@ -565,18 +598,18 @@ const Customer = () => {
                         onChange={(e) => handleSearchChange(e.target.value)}
                       />
                     </InputGroup>
-                    
+
                     <Button variant="outline-primary" onClick={handleExportCSV}>
                       <FaFileExport className="me-2" /> Xuất CSV
                     </Button>
-                    
+
                     <Button variant="warning" onClick={handleAdd}>
                       <FaPlus className="me-2 mb-1" /> Thêm khách hàng
                     </Button>
                   </div>
                 </div>
 
-                  {/* Bulk Actions - hành động hàng loạt */}
+                {/* Bulk Actions - hành động hàng loạt */}
                 {selectedCustomers.length > 0 && (
                   <div className="d-flex justify-content-between align-items-center mb-3 p-3 bg-warning bg-opacity-10 rounded-3">
                     <div className="text-white">
@@ -591,7 +624,7 @@ const Customer = () => {
                   </div>
                 )}
 
-                  {/* Customers Table - bảng dữ liệu khách hàng */}
+                {/* Customers Table - bảng dữ liệu khách hàng */}
                 {loading ? (
                   <div className="d-flex flex-column justify-content-center align-items-center py-5" style={{ minHeight: '400px' }}>
                     <div className="spinner-border text-warning" role="status" style={{ width: '3rem', height: '3rem' }}>
@@ -601,103 +634,103 @@ const Customer = () => {
                   </div>
                 ) : (
                   <>
-                  <Table responsive hover className="luxury-table align-middle">
-                    <thead>
-                      <tr>
-                        <th style={{ width: '50px' }}>
-                          <Button variant="link" className="text-warning p-0" onClick={handleSelectAll}>
-                            {selectedCustomers.length === paginatedCustomers.length && paginatedCustomers.length > 0 ? 
-                              <FaCheckSquare /> : <FaSquare />}
-                          </Button>
-                        </th>
-                        <th>ID</th>
-                        <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
-                          Họ và tên {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th>Số điện thoại</th>
-                        <th>Email</th>
-                        <th>Thao tác</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedCustomers.length === 0 ? (
+                    <Table responsive hover className="luxury-table align-middle">
+                      <thead>
                         <tr>
-                          <td colSpan="6" className="text-center py-5 text-white-50 fw-bold">
-                            {(searchQuery) ? 'Không tìm thấy khách hàng' : 'Chưa có dữ liệu khách hàng'}
-                          </td>
+                          <th style={{ width: '50px' }}>
+                            <Button variant="link" className="text-warning p-0" onClick={handleSelectAll}>
+                              {selectedCustomers.length === paginatedCustomers.length && paginatedCustomers.length > 0 ?
+                                <FaCheckSquare /> : <FaSquare />}
+                            </Button>
+                          </th>
+                          <th>ID</th>
+                          <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
+                            Họ và tên {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
+                          </th>
+                          <th>Số điện thoại</th>
+                          <th>Email</th>
+                          <th>Thao tác</th>
                         </tr>
-                      ) : (
-                        paginatedCustomers.map((customer) => (
-                          <tr key={customer.id}>
-                            <td>
-                              <Button variant="link" className="text-warning p-0" onClick={() => handleSelectCustomer(customer.id)}>
-                                {selectedCustomers.includes(customer.id) ? <FaCheckSquare /> : <FaSquare />}
-                              </Button>
-                            </td>
-                            <td className="fw-bold text-warning">#{customer.id}</td>
-                            <td className="fw-semibold">{customer.name}</td>
-                            <td>{customer.phone}</td>
-                            <td>{customer.email}</td>
-                            <td>
-                              <Button variant="outline-info" size="sm" className="me-2" onClick={() => handleViewDetails(customer)}>
-                                <FaEye />
-                              </Button>
-                              <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleEdit(customer)}>
-                                <FaEdit />
-                              </Button>
-                              <Button variant="outline-danger" size="sm" onClick={() => handleDelete(customer.id)}>
-                                <FaTrash />
-                              </Button>
+                      </thead>
+                      <tbody>
+                        {paginatedCustomers.length === 0 ? (
+                          <tr>
+                            <td colSpan="6" className="text-center py-5 text-white-50 fw-bold">
+                              {(searchQuery) ? 'Không tìm thấy khách hàng' : 'Chưa có dữ liệu khách hàng'}
                             </td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </Table>
+                        ) : (
+                          paginatedCustomers.map((customer) => (
+                            <tr key={customer.id}>
+                              <td>
+                                <Button variant="link" className="text-warning p-0" onClick={() => handleSelectCustomer(customer.id)}>
+                                  {selectedCustomers.includes(customer.id) ? <FaCheckSquare /> : <FaSquare />}
+                                </Button>
+                              </td>
+                              <td className="fw-bold text-warning">#{customer.id}</td>
+                              <td className="fw-semibold">{customer.name}</td>
+                              <td>{customer.phone}</td>
+                              <td>{customer.email}</td>
+                              <td>
+                                <Button variant="outline-info" size="sm" className="me-2" onClick={() => handleViewDetails(customer)}>
+                                  <FaEye />
+                                </Button>
+                                <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleEdit(customer)}>
+                                  <FaEdit />
+                                </Button>
+                                <Button variant="outline-danger" size="sm" onClick={() => handleDelete(customer.id)}>
+                                  <FaTrash />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </Table>
 
-                  {/* Pagination controls - điều khiển phân trang */}
-                  {totalPages > 1 && (
-                    <div className="d-flex justify-content-between align-items-center mt-4">
-                      <div className="d-flex align-items-center gap-3">
-                        <div className="text-warning fw-bold" style={{ fontSize: '16px' }}>
-                          Hiển thị {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, sortedCustomers.length)} của {sortedCustomers.length} khách hàng
+                    {/* Pagination controls - điều khiển phân trang */}
+                    {totalPages > 1 && (
+                      <div className="d-flex justify-content-between align-items-center mt-4">
+                        <div className="d-flex align-items-center gap-3">
+                          <div className="text-warning fw-bold" style={{ fontSize: '16px' }}>
+                            Hiển thị {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, sortedCustomers.length)} của {sortedCustomers.length} khách hàng
+                          </div>
+                          <div className="d-flex align-items-center gap-2">
+                            <span className="text-warning fw-bold" style={{ fontSize: '16px' }}>Hiển thị:</span>
+                            <Form.Select
+                              value={itemsPerPage}
+                              onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                              style={{ width: '80px' }}
+                              className="dark-input"
+                            >
+                              <option value={5}>5</option>
+                              <option value={10}>10</option>
+                              <option value={20}>20</option>
+                              <option value={50}>50</option>
+                            </Form.Select>
+                          </div>
                         </div>
-                        <div className="d-flex align-items-center gap-2">
-                          <span className="text-warning fw-bold" style={{ fontSize: '16px' }}>Hiển thị:</span>
-                          <Form.Select 
-                            value={itemsPerPage} 
-                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                            style={{ width: '80px' }}
-                            className="dark-input"
-                          >
-                            <option value={5}>5</option>
-                            <option value={10}>10</option>
-                            <option value={20}>20</option>
-                            <option value={50}>50</option>
-                          </Form.Select>
-                        </div>
+                        <Pagination className="pagination-luxury">
+                          <Pagination.Prev
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                          />
+                          {[...Array(totalPages)].map((_, index) => (
+                            <Pagination.Item
+                              key={index + 1}
+                              active={index + 1 === currentPage}
+                              onClick={() => setCurrentPage(index + 1)}
+                            >
+                              {index + 1}
+                            </Pagination.Item>
+                          ))}
+                          <Pagination.Next
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                          />
+                        </Pagination>
                       </div>
-                      <Pagination className="mb-0">
-                        <Pagination.Prev 
-                          disabled={currentPage === 1} 
-                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        />
-                        {[...Array(totalPages)].map((_, index) => (
-                          <Pagination.Item
-                            key={index + 1}
-                            active={index + 1 === currentPage}
-                            onClick={() => setCurrentPage(index + 1)}
-                          >
-                            {index + 1}
-                          </Pagination.Item>
-                        ))}
-                        <Pagination.Next 
-                          disabled={currentPage === totalPages} 
-                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        />
-                      </Pagination>
-                    </div>
-                  )}
+                    )}
                   </>
                 )}
               </Card.Body>
@@ -809,14 +842,14 @@ const Customer = () => {
                       </label>
                       <div className="text-white fs-5">#{selectedCustomer.id}</div>
                     </div>
-                    
+
                     <div className="mb-3">
                       <label className="text-warning fw-bold small mb-2 d-block">
                         Họ và tên
                       </label>
                       <div className="text-white fs-5">{selectedCustomer.name}</div>
                     </div>
-                    
+
                     <div className="row">
                       <div className="col-md-6 mb-3">
                         <label className="text-warning fw-bold small mb-2 d-block">
@@ -824,7 +857,7 @@ const Customer = () => {
                         </label>
                         <div className="text-white fs-5">{selectedCustomer.phone}</div>
                       </div>
-                      
+
                       <div className="col-md-6 mb-3">
                         <label className="text-warning fw-bold small mb-2 d-block">
                           Email
