@@ -156,18 +156,32 @@ const Customer = () => {
     setModalVisible(true);
   };
 
-  // Handle search input change - chỉ cho phép số
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    if (value === '' || validatePhone(value)) {
-      setSearchPhone(value);
+  // Enhanced search handlers
+  const handleSearchChange = (field, value) => {
+    switch(field) {
+      case 'phone':
+        if (value === '' || validatePhone(value)) {
+          setSearchPhone(value);
+        }
+        break;
+      case 'name':
+        setSearchName(value);
+        break;
+      case 'email':
+        setSearchEmail(value);
+        break;
     }
   };
 
-  // Filter customers by phone
-  const filteredCustomers = customers.filter(customer =>
-    customer.phone.includes(searchPhone)
-  );
+  // Enhanced search functionality
+  const filteredCustomers = useMemo(() => {
+    return customers.filter(customer => {
+      const matchesPhone = customer.phone.includes(searchPhone);
+      const matchesName = customer.name.toLowerCase().includes(searchName.toLowerCase());
+      const matchesEmail = customer.email.toLowerCase().includes(searchEmail.toLowerCase());
+      return matchesPhone && matchesName && matchesEmail;
+    });
+  }, [customers, searchPhone, searchName, searchEmail]);
 
   // Phone validation - chỉ cho phép số
   const validatePhone = (phone) => {
@@ -354,17 +368,39 @@ const Customer = () => {
                     <FaUser className="me-2 text-warning" /> Quản lý Khách hàng
                   </h5>
 
-                  <div className="d-flex gap-2 align-items-center">
-                    <InputGroup style={{ width: '320px' }}>
+                  <div className="d-flex gap-2 align-items-center flex-wrap">
+                    <InputGroup style={{ width: '250px' }}>
+                      <InputGroup.Text><FaSearch /></InputGroup.Text>
+                      <Form.Control
+                        type="text"
+                        placeholder="Tên khách hàng"
+                        className="dark-input"
+                        value={searchName}
+                        onChange={(e) => handleSearchChange('name', e.target.value)}
+                      />
+                    </InputGroup>
+                    
+                    <InputGroup style={{ width: '200px' }}>
                       <InputGroup.Text><FaSearch /></InputGroup.Text>
                       <Form.Control
                         type="tel"
                         inputMode="numeric"
                         pattern="[0-9]*"
-                        placeholder="Tìm kiếm theo số điện thoại"
+                        placeholder="Số điện thoại"
                         className="dark-input"
                         value={searchPhone}
-                        onChange={handleSearchChange}
+                        onChange={(e) => handleSearchChange('phone', e.target.value)}
+                      />
+                    </InputGroup>
+                    
+                    <InputGroup style={{ width: '200px' }}>
+                      <InputGroup.Text><FaSearch /></InputGroup.Text>
+                      <Form.Control
+                        type="email"
+                        placeholder="Email"
+                        className="dark-input"
+                        value={searchEmail}
+                        onChange={(e) => handleSearchChange('email', e.target.value)}
                       />
                     </InputGroup>
                     
@@ -397,7 +433,7 @@ const Customer = () => {
                       {filteredCustomers.length === 0 ? (
                         <tr>
                           <td colSpan="5" className="text-center py-5 text-white-50 fw-bold">
-                            {searchPhone ? 'Không tìm thấy khách hàng' : 'Chưa có dữ liệu khách hàng'}
+                            {(searchPhone || searchName || searchEmail) ? 'Không tìm thấy khách hàng' : 'Chưa có dữ liệu khách hàng'}
                           </td>
                         </tr>
                       ) : (
