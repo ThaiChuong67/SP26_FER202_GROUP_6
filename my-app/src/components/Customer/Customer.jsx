@@ -173,6 +173,16 @@ const Customer = () => {
     }
   };
 
+  // Handle sort
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
   // Enhanced search functionality
   const filteredCustomers = useMemo(() => {
     return customers.filter(customer => {
@@ -182,6 +192,25 @@ const Customer = () => {
       return matchesPhone && matchesName && matchesEmail;
     });
   }, [customers, searchPhone, searchName, searchEmail]);
+
+  // Sort customers
+  const sortedCustomers = useMemo(() => {
+    return [...filteredCustomers].sort((a, b) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
+      
+      if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+      
+      if (sortDirection === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+  }, [filteredCustomers, sortField, sortDirection]);
 
   // Phone validation - chỉ cho phép số
   const validatePhone = (phone) => {
@@ -422,22 +451,30 @@ const Customer = () => {
                   <Table responsive hover className="luxury-table align-middle">
                     <thead>
                       <tr>
-                        <th>ID</th>
-                        <th>Họ và tên</th>
-                        <th>Số điện thoại</th>
-                        <th>Email</th>
+                        <th onClick={() => handleSort('id')} style={{ cursor: 'pointer' }}>
+                          ID {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
+                          Họ và tên {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th onClick={() => handleSort('phone')} style={{ cursor: 'pointer' }}>
+                          Số điện thoại {sortField === 'phone' && (sortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th onClick={() => handleSort('email')} style={{ cursor: 'pointer' }}>
+                          Email {sortField === 'email' && (sortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
                         <th>Thao tác</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredCustomers.length === 0 ? (
+                      {sortedCustomers.length === 0 ? (
                         <tr>
                           <td colSpan="5" className="text-center py-5 text-white-50 fw-bold">
                             {(searchPhone || searchName || searchEmail) ? 'Không tìm thấy khách hàng' : 'Chưa có dữ liệu khách hàng'}
                           </td>
                         </tr>
                       ) : (
-                        filteredCustomers.map((customer) => (
+                        sortedCustomers.map((customer) => (
                           <tr key={customer.id}>
                             <td className="fw-bold text-warning">#{customer.id}</td>
                             <td className="fw-semibold">{customer.name}</td>
