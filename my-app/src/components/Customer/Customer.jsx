@@ -262,6 +262,62 @@ const Customer = () => {
     }
   };
 
+  // Handle view details
+  const handleViewDetails = (customer) => {
+    setSelectedCustomer(customer);
+    setDetailModalVisible(true);
+  };
+
+  // Handle bulk delete
+  const handleBulkDelete = async () => {
+    if (selectedCustomers.length === 0) {
+      premiumSwal.fire('Thông báo!', 'Vui lòng chọn ít nhất một khách hàng để xóa.', 'info');
+      return;
+    }
+
+    premiumSwal.fire({
+      title: 'Xác nhận xóa hàng loạt?',
+      html: `Bạn có chắc chắn muốn xóa <strong>${selectedCustomers.length}</strong> khách hàng đã chọn?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Đồng ý Xóa',
+      cancelButtonText: 'Hủy bỏ',
+      background: '#1a1a1a',
+      color: '#fff'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await Promise.all(
+            selectedCustomers.map(id => axios.delete(`http://localhost:5000/customers/${id}`))
+          );
+          premiumSwal.fire('Đã xóa!', `Đã xóa thành công ${selectedCustomers.length} khách hàng.`, 'success');
+          setSelectedCustomers([]);
+          fetchCustomers();
+        } catch (error) {
+          premiumSwal.fire('Lỗi!', 'Lỗi khi xóa khách hàng', 'error');
+        }
+      }
+    });
+  };
+
+  // Handle select all
+  const handleSelectAll = () => {
+    if (selectedCustomers.length === paginatedCustomers.length) {
+      setSelectedCustomers([]);
+    } else {
+      setSelectedCustomers(paginatedCustomers.map(customer => customer.id));
+    }
+  };
+
+  // Handle select individual
+  const handleSelectCustomer = (id) => {
+    setSelectedCustomers(prev => 
+      prev.includes(id) 
+        ? prev.filter(customerId => customerId !== id)
+        : [...prev, id]
+    );
+  };
+
   return (
     <>
       <style>{`
@@ -452,6 +508,21 @@ const Customer = () => {
                   </div>
                 </div>
 
+                {/* Bulk Actions */}
+                {selectedCustomers.length > 0 && (
+                  <div className="d-flex justify-content-between align-items-center mb-3 p-3 bg-warning bg-opacity-10 rounded-3">
+                    <div className="text-white">
+                      <span className="me-3">Đã chọn {selectedCustomers.length} khách hàng</span>
+                      <Button variant="outline-danger" size="sm" onClick={handleBulkDelete}>
+                        <FaTrash className="me-2" />Xóa đã chọn
+                      </Button>
+                    </div>
+                    <Button variant="outline-secondary" size="sm" onClick={() => setSelectedCustomers([])}>
+                      Bỏ chọn
+                    </Button>
+                  </div>
+                )}
+
                 {/* Customers Table */}
                 {loading ? (
                   <div className="d-flex flex-column justify-content-center align-items-center py-5" style={{ minHeight: '400px' }}>
@@ -465,6 +536,12 @@ const Customer = () => {
                   <Table responsive hover className="luxury-table align-middle">
                     <thead>
                       <tr>
+                        <th style={{ width: '50px' }}>
+                          <Button variant="link" className="text-warning p-0" onClick={handleSelectAll}>
+                            {selectedCustomers.length === paginatedCustomers.length && paginatedCustomers.length > 0 ? 
+                              <FaCheckSquare /> : <FaSquare />}
+                          </Button>
+                        </th>
                         <th onClick={() => handleSort('id')} style={{ cursor: 'pointer' }}>
                           ID {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
@@ -483,18 +560,26 @@ const Customer = () => {
                     <tbody>
                       {paginatedCustomers.length === 0 ? (
                         <tr>
-                          <td colSpan="5" className="text-center py-5 text-white-50 fw-bold">
+                          <td colSpan="6" className="text-center py-5 text-white-50 fw-bold">
                             {(searchPhone || searchName || searchEmail) ? 'Không tìm thấy khách hàng' : 'Chưa có dữ liệu khách hàng'}
                           </td>
                         </tr>
                       ) : (
                         paginatedCustomers.map((customer) => (
                           <tr key={customer.id}>
+                            <td>
+                              <Button variant="link" className="text-warning p-0" onClick={() => handleSelectCustomer(customer.id)}>
+                                {selectedCustomers.includes(customer.id) ? <FaCheckSquare /> : <FaSquare />}
+                              </Button>
+                            </td>
                             <td className="fw-bold text-warning">#{customer.id}</td>
                             <td className="fw-semibold">{customer.name}</td>
                             <td>{customer.phone}</td>
                             <td>{customer.email}</td>
                             <td>
+                              <Button variant="outline-info" size="sm" className="me-2" onClick={() => handleViewDetails(customer)}>
+                                <FaEye />
+                              </Button>
                               <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleEdit(customer)}>
                                 <FaEdit />
                               </Button>
