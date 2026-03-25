@@ -724,6 +724,46 @@ const Customer = () => {
             </Button>
           </Modal.Footer>
         </Modal>
+
+        {/* Customer Details Modal */}
+        <Modal show={detailModalVisible} onHide={() => setDetailModalVisible(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Chi tiết khách hàng</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {selectedCustomer && (
+              <div>
+                <div className="mb-3">
+                  <strong className="text-warning">ID:</strong>
+                  <span className="ms-2">#{selectedCustomer.id}</span>
+                </div>
+                <div className="mb-3">
+                  <strong className="text-warning">Họ và tên:</strong>
+                  <span className="ms-2">{selectedCustomer.name}</span>
+                </div>
+                <div className="mb-3">
+                  <strong className="text-warning">Số điện thoại:</strong>
+                  <span className="ms-2">{selectedCustomer.phone}</span>
+                </div>
+                <div className="mb-3">
+                  <strong className="text-warning">Email:</strong>
+                  <span className="ms-2">{selectedCustomer.email}</span>
+                </div>
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setDetailModalVisible(false)}>
+              Đóng
+            </Button>
+            <Button variant="primary" onClick={() => {
+              setDetailModalVisible(false);
+              handleEdit(selectedCustomer);
+            }}>
+              <FaEdit className="me-2" />Sửa
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </Container>
     </>
   );
