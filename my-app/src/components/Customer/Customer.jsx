@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Container, Row, Col, Button, Modal, Form, InputGroup, Table, Card, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Button, Modal, Form, InputGroup, Table, Card, Pagination, Dropdown } from 'react-bootstrap';
 import { FaSearch, FaPlus, FaEdit, FaTrash, FaUser, FaEye, FaFileExport, FaCheckSquare, FaSquare } from 'react-icons/fa';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -424,6 +424,37 @@ const Customer = () => {
         }
         .dark-input::placeholder { color: rgba(255,255,255,0.4) !important; }
 
+        /* Fix dropdown options for Form.Select */
+        .dark-input option {
+          background: #1a1a1a !important;
+          color: #fff !important;
+          padding: 8px !important;
+        }
+        .dark-input option:hover,
+        .dark-input option:focus {
+          background: #ffc107 !important;
+          color: #000 !important;
+        }
+
+        /* Dark dropdown menu */
+        .dark-dropdown-menu {
+          background: #1a1a1a !important;
+          border: 1px solid rgba(255,255,255,0.1) !important;
+          border-radius: 8px !important;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+        }
+        .dark-dropdown-menu .dropdown-item {
+          background: transparent !important;
+          color: #fff !important;
+          padding: 10px 15px !important;
+          font-weight: 500 !important;
+        }
+        .dark-dropdown-menu .dropdown-item:hover,
+        .dark-dropdown-menu .dropdown-item:focus {
+          background: #ffc107 !important;
+          color: #000 !important;
+        }
+
         /* Luxury Table */
         .luxury-table {
           background: transparent !important;
@@ -697,17 +728,23 @@ const Customer = () => {
                           </div>
                           <div className="d-flex align-items-center gap-2">
                             <span className="text-warning fw-bold" style={{ fontSize: '16px' }}>Hiển thị:</span>
-                            <Form.Select
-                              value={itemsPerPage}
-                              onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                              style={{ width: '80px' }}
-                              className="dark-input"
-                            >
-                              <option value={5}>5</option>
-                              <option value={10}>10</option>
-                              <option value={20}>20</option>
-                              <option value={50}>50</option>
-                            </Form.Select>
+                            <Dropdown>
+                              <Dropdown.Toggle 
+                                variant="dark" 
+                                id="dropdown-items-per-page"
+                                style={{ width: '80px', height: '40px' }}
+                                className="dark-input"
+                              >
+                                {itemsPerPage}
+                              </Dropdown.Toggle>
+
+                              <Dropdown.Menu className="dark-dropdown-menu">
+                                <Dropdown.Item onClick={() => setItemsPerPage(5)}>5</Dropdown.Item>
+                                <Dropdown.Item onClick={() => setItemsPerPage(10)}>10</Dropdown.Item>
+                                <Dropdown.Item onClick={() => setItemsPerPage(20)}>20</Dropdown.Item>
+                                <Dropdown.Item onClick={() => setItemsPerPage(50)}>50</Dropdown.Item>
+                              </Dropdown.Menu>
+                            </Dropdown>
                           </div>
                         </div>
                         <Pagination className="pagination-luxury">
