@@ -259,7 +259,7 @@ const Customer = () => {
     else if (name === 'name') {
       // Cho phép nhập tất cả ký tự Unicode (tiếng Việt, Telex, VNI, etc.)
       // Không giới hạn ký tự để người dùng tự do nhập
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData(prev => ({ ...prev, [name]: value }));0
     }
     else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -315,7 +315,7 @@ const Customer = () => {
   };
 
   // ============= EXPORT FUNCTIONS =============
-  // Handle export CSV - xuất dữ liệu ra file CSV
+  // Handle export CSV - xuất dữ liệu ra file Excel
   const handleExportCSV = () => {
     if (sortedCustomers.length === 0) {
       premiumSwal.fire('Thông báo!', 'Không có dữ liệu để xuất.', 'info');
@@ -323,8 +323,8 @@ const Customer = () => {
     }
 
     premiumSwal.fire({
-      title: 'Xác nhận xuất CSV?',
-      html: `Bạn có chắc chắn muốn xuất <strong>${sortedCustomers.length}</strong> khách hàng ra file CSV?<br><small>Dữ liệu sẽ bao gồm các khách hàng đã lọc và sắp xếp hiện tại.</small>`,
+      title: 'Xác nhận xuất Excel?',
+      html: `Bạn có chắc chắn muốn xuất <strong>${sortedCustomers.length}</strong> khách hàng ra file Excel?<br><small>Dữ liệu sẽ bao gồm các khách hàng đã lọc và sắp xếp hiện tại.</small>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Đồng ý Xuất',
@@ -631,7 +631,7 @@ const Customer = () => {
                     </InputGroup>
 
                     <Button variant="outline-primary" onClick={handleExportCSV}>
-                      <FaFileExport className="me-2" /> Xuất CSV
+                      <FaFileExport className="me-2" /> Xuất EXCEL
                     </Button>
 
                     <Button variant="warning" onClick={handleAdd}>
